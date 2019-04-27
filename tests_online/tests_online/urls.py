@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib import admin
-from django.urls import path, include, re_path
+from django.urls import include, path, re_path
 from django.utils.translation import ugettext_lazy as _
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view

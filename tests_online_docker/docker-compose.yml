@@ -27,10 +27,10 @@ services:
     command: nginx -g "daemon off;"
     container_name: tests-online-nginx
     healthcheck:
-        test: ["CMD-SHELL", "curl -I --fail localhost:80"]
-        interval: 30s
-        timeout: 5s
-        retries: 5
+      test: ["CMD-SHELL", "curl -I --fail localhost:80"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
   django:
     image: tests-online-django:latest
@@ -79,7 +79,7 @@ services:
     command: redis-server # --appendonly yes
     container_name: tests-online-redis
     healthcheck:
-        test: ["CMD-SHELL", "redis-cli ping"]
-        interval: 30s
-        timeout: 5s
-        retries: 5
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
