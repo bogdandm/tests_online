@@ -1,5 +1,8 @@
 FROM nginx:latest
 
+RUN apt-get update
+RUN apt-get -y install curl
+
 RUN rm /etc/nginx/conf.d/*
 COPY nginx/* /etc/nginx/conf.d/
 RUN mkdir -p /etc/nginx/ssl/
