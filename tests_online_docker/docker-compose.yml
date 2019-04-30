@@ -18,13 +18,14 @@ services:
     volumes:
       - static-data:/srv/tests-online/static
       - media-data:/srv/tests-online/media
+    working_dir: /opt
     ports:
       - "0.0.0.0:8000:80"
     links:
       - django
     depends_on:
       - django
-    command: nginx -g "daemon off;"
+    command: ./wait-for-it.sh django:2021 -- nginx -g "daemon off;"
     container_name: tests-online-nginx
     healthcheck:
       test: ["CMD-SHELL", "curl -I --fail localhost:80"]
