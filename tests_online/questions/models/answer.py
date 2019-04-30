@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class Answer(models.Model):
-    position = models.PositiveSmallIntegerField(_("Position"), default=-1)
+    position = models.SmallIntegerField(_("Position"), default=-1)
     text = models.TextField(_("Text"))
     params_value = pg_fields.ArrayField(models.FloatField(), verbose_name=_("Parameters"), null=True)
 
