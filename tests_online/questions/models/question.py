@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class Question(models.Model):
-    position = models.IntegerField(_("Position"), default=-1)
+    position = models.PositiveSmallIntegerField(_("Position"), default=-1)
     text = models.TextField(_("Text"))
 
     test = models.ForeignKey('questions.Test', related_name="questions", on_delete=models.CASCADE,
