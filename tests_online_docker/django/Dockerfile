@@ -10,4 +10,6 @@ WORKDIR /opt/tests_online/
 COPY Pipfile ./
 COPY Pipfile.lock ./
 RUN pipenv install --system --deploy --ignore-pipfile
+ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /opt/tests_online/wait-for-it.sh
+RUN chmod +x wait-for-it.sh
 COPY . ./
