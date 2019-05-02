@@ -145,11 +145,15 @@ class ObjectOwner(BasePermissionEx):
     def __init__(self, user_field: str = 'owner'):
         """
 
-        :param user_field: name of 'owner' field ref
+        :param user_field: reference of 'owner' field. Could be dot-separated list
         """
-        self.user_field = user_field
+        self.user_field = user_field.split('.')
 
     def has_permission_ex(self, request, view, obj):
         if obj is None:
             return True
-        return request.user and request.user == getattr(obj, self.user_field)
+        ptr = obj
+        for part in self.user_field:
+            ptr = getattr(ptr, part)
+
+        return request.user and request.user == ptr

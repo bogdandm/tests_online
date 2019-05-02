@@ -14,6 +14,10 @@ class AnswerSerializer(serializers.ModelSerializer):
 class QuestionSerializer(NestedCreateMixin, serializers.ModelSerializer):
     answers = AnswerSerializer(many=True)
 
+    def update(self, instance, validated_data):
+        validated_data.pop("answers")
+        return super().update(instance, validated_data)
+
     class Meta:
         model = models.Question
         fields = ('id', 'position', 'text', 'answers')
@@ -25,19 +29,27 @@ class TestSerializer(NestedCreateMixin, serializers.ModelSerializer):
     questions = QuestionSerializer(many=True)
     owner = serializers.StringRelatedField()
 
-    def validate(self, attrs):
-        attrs = super().validate(attrs)
-        n = len(attrs["params"]) if "params" in attrs else 1
-        if (len(attrs["params_defaults"]) if "params_defaults" in attrs else 1) != n:
-            raise models.Test.TestParamsError("params", "params_defaults")
-        for q in attrs["questions"]:
-            for a in q["answers"]:
-                if len(a["params_value"]) != n:
-                    raise models.Test.TestParamsError('params_value', 'test.params')
-        return attrs
-
     class Meta:
         model = models.Test
         fields = ('id', 'hash', 'title', 'description', 'is_private', 'params', 'params_defaults',
                   'stats_restriction', 'stats_restriction_display', 'owner', 'questions')
         read_only_fields = ('id', 'hash', 'stats_restriction_display', 'owner')
+
+    def validate(self, attrs: dict):
+        attrs = super().validate(attrs)
+        n = len(attrs["params"]) if "params" in attrs else 1
+
+        if (len(attrs["params_defaults"]) if "params_defaults" in attrs else 1) != n:
+            raise models.Test.TestParamsError("params", "params_defaults")
+
+        if "questions" in attrs:
+            for question in attrs["questions"]:
+                if "answers" in question:
+                    for answer in question["answers"]:
+                        if len(answer["params_value"]) != n:
+                            raise models.Test.TestParamsError('params_value', 'test.params')
+        return attrs
+
+    def update(self, instance, validated_data):
+        validated_data.pop("questions")
+        return super().update(instance, validated_data)

@@ -21,6 +21,7 @@ django-redis = "*"
 uwsgi = "*"
 djangorestframework-simplejwt = "*"
 drf-writable-nested = "*"
+drf-nested-routers = "*"
 
 [requires]
 python_version = "3.7"
