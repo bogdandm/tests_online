@@ -1,4 +1,4 @@
-from drf_writable_nested import WritableNestedModelSerializer
+from drf_writable_nested import NestedCreateMixin
 from rest_framework import serializers
 
 from .. import models
@@ -11,7 +11,7 @@ class AnswerSerializer(serializers.ModelSerializer):
         read_only_fields = ('id',)
 
 
-class QuestionSerializer(WritableNestedModelSerializer):
+class QuestionSerializer(NestedCreateMixin, serializers.ModelSerializer):
     answers = AnswerSerializer(many=True)
 
     class Meta:
@@ -20,7 +20,7 @@ class QuestionSerializer(WritableNestedModelSerializer):
         read_only_fields = ('id',)
 
 
-class TestSerializer(WritableNestedModelSerializer):
+class TestSerializer(NestedCreateMixin, serializers.ModelSerializer):
     stats_restriction_display = serializers.CharField(source='get_stats_restriction_display', read_only=True)
     questions = QuestionSerializer(many=True)
     owner = serializers.StringRelatedField()
@@ -28,8 +28,8 @@ class TestSerializer(WritableNestedModelSerializer):
     def validate(self, attrs):
         attrs = super().validate(attrs)
         n = len(attrs["params"]) if "params" in attrs else 1
-        if (len(attrs["params_default"]) if "params" in attrs else 1) != n:
-            raise models.Test.TestParamsError("params", "params_default")
+        if (len(attrs["params_defaults"]) if "params_defaults" in attrs else 1) != n:
+            raise models.Test.TestParamsError("params", "params_defaults")
         for q in attrs["questions"]:
             for a in q["answers"]:
                 if len(a["params_value"]) != n:

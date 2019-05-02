@@ -37,6 +37,18 @@ class APITestCaseEx(APITestCase):
             raise e
         return data
 
+    def assertWrongResp(self, resp, code=None):
+        if code is None:
+            self.assertNotEqual(resp.status_code // 100, 2, resp.content.decode())
+        else:
+            self.assertEqual(resp.status_code, code, resp.content.decode())
+
+        try:
+            data = resp.json()
+        except:
+            return resp.content.decode()
+        return data
+
     def assertBulk(self, data: list, path: str, value: Any):
         return all(get_by_dict_path(item, path) == value for item in data)
 

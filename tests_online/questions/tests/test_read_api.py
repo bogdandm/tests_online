@@ -3,6 +3,7 @@ import operator
 from django.test import override_settings
 from django.urls import reverse
 
+from auth.test_utils import get_auth_headers
 from core.tests.utils import APITestCaseEx
 from .data_setup import QuestionsTestData
 from .. import models
@@ -34,9 +35,7 @@ class TestReadApi(QuestionsTestData, APITestCaseEx):
         self.assertEqual(len(tests), 1)
         self.assertEqual(tests[0]["title"], "public_test")
 
-        resp = self.client.post(reverse('token_obtain_pair'), data=self.CREDENTIALS)
-        tokens = self.assertResp(resp)
-        headers = {'HTTP_AUTHORIZATION': f'Bearer {tokens["access"]}'}
+        headers = get_auth_headers(self.client, **self.CREDENTIALS)
 
         resp = self.client.get(reverse('tests-list'), **headers)
         tests = self.assertResp(resp)["results"]
