@@ -20,6 +20,7 @@ django-debug-toolbar = "*"
 django-redis = "*"
 uwsgi = "*"
 djangorestframework-simplejwt = "*"
+drf-writable-nested = "*"
 
 [requires]
 python_version = "3.7"

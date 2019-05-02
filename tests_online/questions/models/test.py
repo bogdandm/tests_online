@@ -28,6 +28,16 @@ def _params_defaults__default():
 
 
 class Test(models.Model):
+    class TestParamsError(ValidationError):
+        def __init__(self, *fields):
+            self.fields = fields
+            super().__init__(_("Length of {} fields should be equal").format(fields))
+
+        def __repr__(self):
+            return 'TestParamsError(%s)' % self
+
+
+
     STATS_RESTRICTIONS_CHOICES = (
         (TestStatsChoices.OFF, _("Off")),
         (TestStatsChoices.ANY, _("Any")),
@@ -60,4 +70,4 @@ class Test(models.Model):
 
     def clean(self):
         if len(self.params) != len(self.params_defaults):
-            raise ValidationError(_("Length of `params` and `params_defaults` fields should be equal"))
+            raise self.TestParamsError('params', 'params_defaults')

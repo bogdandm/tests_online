@@ -43,6 +43,8 @@ class BasePermissionEx(BasePermission):
 class OrCombiner(BasePermissionEx):
     """
     Return True if at least ONE of given permissions in True
+
+    >>> permission_classes = (OrCombiner(Perm1, Perm2, Perm3),)
     """
 
     def __init__(self, *perm):
@@ -59,6 +61,8 @@ class OrCombiner(BasePermissionEx):
 class AndCombiner(BasePermissionEx):
     """
     Return True if ALL of given permissions in True
+
+    >>> permission_classes = (AndCombiner(Perm1, Perm2, Perm3),)
     """
 
     def __init__(self, *perm):
@@ -75,6 +79,8 @@ class AndCombiner(BasePermissionEx):
 class MethodCombiner(BasePermissionEx):
     """
     Call diffrent permission classes depends of request.method
+
+    >>> permission_classes = (MethodCombiner({"GET": GetPermission, "POST": PostPermission}),)
     """
 
     def __init__(self, dictionary):
@@ -100,6 +106,8 @@ class MethodCombiner(BasePermissionEx):
 class ActionCombiner(BasePermissionEx):
     """
     Call different permission classes depends of view.action
+
+    >>> permission_classes = (MethodCombiner({"list": AllowAny, "create": IsAdmin}),)
     """
 
     def __init__(self, dictionary):
@@ -126,3 +134,22 @@ class ActionCombiner(BasePermissionEx):
                 raise TypeError(perm, " is not valid permission")
         else:
             raise KeyError(method)
+
+
+class ObjectOwner(BasePermissionEx):
+    """
+    Return True if authorized user is owner of given object.
+    Return True for multi-object action.
+    """
+
+    def __init__(self, user_field: str = 'owner'):
+        """
+
+        :param user_field: name of 'owner' field ref
+        """
+        self.user_field = user_field
+
+    def has_permission_ex(self, request, view, obj):
+        if obj is None:
+            return True
+        return request.user and request.user == getattr(obj, self.user_field)

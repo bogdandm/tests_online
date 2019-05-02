@@ -7,7 +7,6 @@ from django.utils.translation import ugettext_lazy as _
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
-from  rest_framework_simplejwt import views as jwt_views
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -21,10 +20,8 @@ schema_view = get_schema_view(
 )
 
 apipatterns = [
+    path('', include('auth.urls')),
     path('', include('questions.urls')),
-    path('auth/token/obtain/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('auth/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
-    path('auth/token/verify/', jwt_views.TokenVerifyView.as_view(), name='token_verify'),
 ]
 
 urlpatterns = [
@@ -37,6 +34,7 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
+    # Some dev's views
     import debug_toolbar
     from rest_framework.decorators import api_view
     from rest_framework.response import Response
@@ -67,6 +65,7 @@ if settings.DEBUG:
         return Response({
             "auth": dump(request.auth),
             "user": dump(request.user),
+            "request.user.is_authenticated": request.user.is_authenticated
         })
 
 

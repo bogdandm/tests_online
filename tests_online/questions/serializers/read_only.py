@@ -29,6 +29,7 @@ class TestReadOnlySerializer(serializers.ModelSerializer):
 
 class TestReadOnlyShortSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='tests-detail', lookup_field='hash', read_only=True)
+    owner = serializers.StringRelatedField()
 
     class Meta:
         model = models.Test
