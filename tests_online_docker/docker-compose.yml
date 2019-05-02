@@ -1,4 +1,4 @@
-# TODO: Add health check
+# TODO: Add health check to django
 
 version: '3.7'
 
