@@ -6,14 +6,15 @@ from . import models
 class QuestionAdminInline(admin.TabularInline):
     model = models.Question
 
+
 @admin.register(models.Test)
 class TestAdmin(admin.ModelAdmin):
     inlines = [QuestionAdminInline]
 
 
-
 class AnswerAdminInline(admin.TabularInline):
     model = models.Answer
+
 
 @admin.register(models.Question)
 class QuestionAdmin(admin.ModelAdmin):

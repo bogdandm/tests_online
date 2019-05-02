@@ -1,8 +1,8 @@
-from .core import BASE_PATH, DEBUG
 import os
 
+from .core import BASE_PATH, DEBUG
 
-LOG_DIR = BASE_PATH.parent /  os.environ.get('LOG_DIR', 'logs_tmp')
+LOG_DIR = BASE_PATH.parent / os.environ.get('LOG_DIR', 'logs_tmp')
 LOG_DIR.mkdir(exist_ok=True)
 
 LOGGING = {

@@ -34,5 +34,3 @@ class TestReadOnlyShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Test
         fields = ('id', 'url', 'hash', 'title', 'params', 'stats_restriction', 'owner')
-
-

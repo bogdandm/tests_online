@@ -36,8 +36,6 @@ class Test(models.Model):
         def __repr__(self):
             return 'TestParamsError(%s)' % self
 
-
-
     STATS_RESTRICTIONS_CHOICES = (
         (TestStatsChoices.OFF, _("Off")),
         (TestStatsChoices.ANY, _("Any")),
