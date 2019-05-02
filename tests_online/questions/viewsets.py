@@ -10,12 +10,20 @@ class TestsViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = 'hash'
 
     def filter_queryset(self, queryset):
-        qs = queryset.filter(is_private=False)
-        if self.request.auth:
-            user = self.request.auth.user
+        if self.action == "list":
+            qs = queryset.filter(is_private=False)
+            if self.request.auth:
+                user = self.request.auth.user
+            elif self.request.user:
+                user = self.request.user
+            else:
+                return qs
+
             if not user.is_anonymous:
-                qs += queryset.filter(is_private=True, owner=user)
-        return qs
+                return qs | queryset.filter(is_private=True, owner=user)
+            return qs
+        else:
+            return queryset
 
     def get_serializer_class(self):
         return {

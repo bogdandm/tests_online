@@ -1,5 +1,8 @@
 import json
+import operator
 from datetime import datetime
+from functools import reduce
+from typing import Any
 
 from rest_framework.test import APIClient, APITestCase
 
@@ -17,18 +20,25 @@ class LoggingAPIClient(APIClient):
         return resp
 
 
+def get_by_dict_path(data: dict, path):
+    return reduce(operator.getitem, path.split('.'), data)
+
+
 class APITestCaseEx(APITestCase):
     credentials = {"username": "admin", "password": "asdfGDFHdsfhadfhHSER"}
     auto_login = False
     client_class = LoggingAPIClient
 
     def assertResp(self, resp):
-        self.assertEqual(resp.status_code // 100, 2, resp.content)
+        self.assertEqual(resp.status_code // 100, 2, resp.content.decode())
         try:
             data = resp.json()
         except Exception as e:
             raise e
         return data
+
+    def assertBulk(self, data: list, path: str, value: Any):
+        return all(get_by_dict_path(item, path) == value for item in data)
 
     def setUp(self):
         if self.auto_login:

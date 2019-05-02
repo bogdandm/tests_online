@@ -53,6 +53,7 @@ class Test(models.Model):
     class Meta:
         verbose_name = _("Test")
         verbose_name_plural = _("Tests")
+        ordering = ("id",)
 
     def __str__(self):
         return self.title

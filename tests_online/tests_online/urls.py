@@ -1,3 +1,5 @@
+import json
+
 from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path, re_path
@@ -46,10 +48,29 @@ if settings.DEBUG:
         raise Exception(request.GET)
 
 
+    def json_default(value):
+        if hasattr(value, '__dict__'):
+            return value.__dict__
+        else:
+            return str(value)
+
+
+    @api_view(http_method_names=["GET"])
+    def debug_info(request):
+        def dump(data):
+            return json.loads(json.dumps(data, default=json_default))
+
+        return Response({
+            "auth": dump(request.auth),
+            "user": dump(request.user),
+        })
+
+
     urlpatterns += [
         path('__debug__/', include(debug_toolbar.urls)),
-        path('api/v1/echo/', echo),
-        path('api/v1/500/', error)
+        path('api/v1/debug/echo/', echo),
+        path('api/v1/debug/500/', error),
+        path('api/v1/debug/info/', debug_info)
     ]
 
 admin.autodiscover()
