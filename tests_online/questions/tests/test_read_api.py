@@ -34,9 +34,11 @@ class TestReadApi(QuestionsTestData, APITestCaseEx):
         self.assertEqual(len(tests), 1)
         self.assertEqual(tests[0]["title"], "public_test")
 
-        self.assertTrue(self.client.login(**self.CREDENTIALS))
+        resp = self.client.post(reverse('token_obtain_pair'), data=self.CREDENTIALS)
+        tokens = self.assertResp(resp)
+        headers = {'HTTP_AUTHORIZATION': f'Bearer {tokens["access"]}'}
 
-        resp = self.client.get(reverse('tests-list'))
+        resp = self.client.get(reverse('tests-list'), **headers)
         tests = self.assertResp(resp)["results"]
         self.assertGreater(len(tests), 1)
         self.assertTrue("private_test" in map(operator.itemgetter('title'), tests))

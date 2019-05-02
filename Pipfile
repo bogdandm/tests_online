@@ -19,6 +19,7 @@ drf-yasg = "*"
 django-debug-toolbar = "*"
 django-redis = "*"
 uwsgi = "*"
+djangorestframework-simplejwt = "*"
 
 [requires]
 python_version = "3.7"
