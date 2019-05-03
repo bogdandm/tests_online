@@ -55,7 +55,7 @@ services:
     expose:
       - 2021
     #    command: tail -f /dev/null
-    command: /bin/bash -c './wait-for-it.sh db:5432 redis:6379 -- /opt/tests_online/tests_online_docker/django/run_django.sh'
+    command: ./wait-for-it.sh db:5432 redis:6379 -- /opt/tests_online/tests_online_docker/django/run_django.sh
     container_name: tests-online-django
 
   django-migrate:
@@ -73,11 +73,11 @@ services:
     depends_on:
       - db
       - redis
-    command: /bin/bash -c './wait-for-it.sh redis:6379 -- ./wait-for-it.sh db:5432 -- /opt/tests_online/tests_online_docker/django/migrate.sh'
+    command: ./wait-for-it.sh redis:6379 -- ./wait-for-it.sh db:5432 -- /opt/tests_online/tests_online_docker/django/migrate.sh
     container_name: tests-online-django-migrate
 
   db:
-    image: postgres:latest
+    image: postgres:11-alpine
     restart: unless-stopped
     volumes:
       - pg-data:/var/lib/postgresql/data
@@ -93,13 +93,12 @@ services:
       retries: 5
 
   redis:
-    image: redis:latest
+    image: redis:5-alpine
     restart: unless-stopped
     volumes:
       - redis-data:/data
     expose:
       - 6379
-    command: redis-server # --appendonly yes
     container_name: tests-online-redis
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping"]

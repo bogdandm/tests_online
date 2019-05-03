@@ -1,15 +1,26 @@
-FROM python:3.7
+FROM python:3.7-alpine
 ENV PYTHONUNBUFFERED 1
-
-RUN apt-get update
-RUN apt-get -y install procmail less nano
-RUN pip install pipenv
 
 RUN mkdir /opt/tests_online/
 WORKDIR /opt/tests_online/
-COPY Pipfile ./
-COPY Pipfile.lock ./
-RUN pipenv install --system --deploy --ignore-pipfile --dev
+
+RUN apk add --no-cache --update \
+    build-base \
+    linux-headers \
+    python3-dev \
+    bash \
+    jpeg-dev \
+    zlib-dev \
+    postgresql-dev \
+    pcre-dev \
+    && rm -rf /var/cache/apk/*
+
+RUN pip install --upgrade pip && pip install pipenv
+
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /opt/tests_online/wait-for-it.sh
 RUN chmod +x wait-for-it.sh
+
+COPY Pipfile* ./
+RUN pipenv install --system --deploy --ignore-pipfile --dev
+
 COPY . ./
