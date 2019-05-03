@@ -48,3 +48,74 @@ class TestReadApi(QuestionsTestData, APITestCaseEx):
             test = self.assertResp(resp)
             self.assertTrue(test["questions"])
             self.assertTrue(all(q["answers"] for q in test["questions"]))
+
+
+@override_settings(
+    MIDDLEWARE=[
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'core.middleware.UTF8Middleware'
+    ],
+    INSTALLED_APPS=[
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+
+        'rest_framework',
+        'rest_framework.authtoken',
+
+        'core',
+        'questions'
+    ]
+)
+class QuestionTestApi(QuestionsTestData, APITestCaseEx):
+    def test_list(self):
+        test_hash = self.private_test.hash
+        resp = self.client.get(reverse('questions-list', kwargs={'test_hash': test_hash}))
+        questions = self.assertResp(resp)["results"]
+        self.assertTrue(questions)
+
+    def test_detail(self):
+        test_hash = self.private_test.hash
+        q_id = models.Question.objects.filter(test__hash=test_hash).first().id
+        resp = self.client.get(reverse('questions-detail', kwargs={'test_hash': test_hash, 'pk': q_id}))
+        question = self.assertResp(resp)
+        self.assertTrue(question)
+
+
+@override_settings(
+    MIDDLEWARE=[
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'core.middleware.UTF8Middleware'
+    ],
+    INSTALLED_APPS=[
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+
+        'rest_framework',
+        'rest_framework.authtoken',
+
+        'core',
+        'questions'
+    ]
+)
+class AnswersTestApi(QuestionsTestData, APITestCaseEx):
+    def test_list(self):
+        test_hash = self.private_test.hash
+        q_id = models.Question.objects.filter(test__hash=test_hash).first().id
+        resp = self.client.get(reverse('answers-list', kwargs={'test_hash': test_hash, 'question_pk': q_id}))
+        answers = self.assertResp(resp)["results"]
+        self.assertTrue(answers)
+
+    def test_detail(self):
+        test_hash = self.private_test.hash
+        q_id = models.Question.objects.filter(test__hash=test_hash).first().id
+        a_id = models.Answer.objects.filter(question_id=q_id).first().id
+        resp = self.client.get(reverse('answers-detail',
+                                       kwargs={'test_hash': test_hash, 'question_pk': q_id, 'pk': a_id}))
+        answer = self.assertResp(resp)
+        self.assertTrue(answer)
