@@ -9,14 +9,19 @@ from rest_framework.test import APIClient, APITestCase
 
 class LoggingAPIClient(APIClient):
     def generic(self, method, path, *args, **kwargs):
-        print(f"[{datetime.now()}] {method:<5} {path:<40}", end="")
+        if len(path) < 50:
+            print(f"[{datetime.now()}] {method:<5} {path:<40}", end="")
+            cut = 50
+        else:
+            print(f"[{datetime.now()}] {method:<5} {path} => \\\n      ", end="")
+            cut = 150
         resp = super(LoggingAPIClient, self).generic(method, path, *args, **kwargs)
         try:
             data = resp.json()
         except:
             data = resp.content
         data = json.dumps(data, ensure_ascii=False, sort_keys=True, default=str)
-        print(f" => {resp.status_code} {data[:50]}{'...' if len(data) > 50 else ''}")
+        print(f" => {resp.status_code} {data[:cut]}{'...' if len(data) > cut else ''}")
         return resp
 
 

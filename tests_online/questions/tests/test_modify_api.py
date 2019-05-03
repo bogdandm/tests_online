@@ -206,3 +206,130 @@ class QuestionsModifyApi(APITestCaseEx):
 
         resp = self.client.get(reverse('questions-detail', kwargs={'test_hash': self.hash, 'pk': question_id}))
         self.assertWrongResp(resp, 404)
+
+
+@override_settings(**TEST_SETTINGS)
+class AnswersModifyApi(APITestCaseEx):
+    CREDENTIALS_ADMIN = {
+        "username": "test_admin",
+        "email": "",
+        "password": "qwerty12"
+    }
+    CREDENTIALS = {
+        "username": "test_user",
+        "email": "",
+        "password": "qwerty12"
+    }
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.User = get_user_model()
+        cls.user = cls.User.objects.create_user(**cls.CREDENTIALS)
+        cls.admin = cls.User.objects.create_superuser(**cls.CREDENTIALS_ADMIN)
+
+    def setUp(self):
+        payload = get_test_payload()
+        headers = get_auth_headers(self.client, **self.CREDENTIALS)
+        resp = self.client.post(reverse('tests-list'), data=payload, **headers)
+        test = self.assertResp(resp)
+        self.hash = test["hash"]
+        self.question_id = choice(test["questions"])["id"]
+        self.params_n = len(test["params"])
+
+    def get_payload(self, params_n):
+        return {
+            "position": 1000,
+            "text": random_text.random_paragraph((20, 30), (1, 2)),
+            "params_value": [randint(0, 3) for _ in range(params_n)]
+        }
+
+    def test_create(self):
+        headers = get_auth_headers(self.client, **self.CREDENTIALS)
+        headers_admin = get_auth_headers(self.client, **self.CREDENTIALS_ADMIN)
+
+        resp = self.client.get(reverse('questions-detail', kwargs={'test_hash': self.hash, 'pk': self.question_id}))
+        question_before = self.assertResp(resp)
+
+        payload = self.get_payload(self.params_n)
+
+        resp = self.client.post(
+            reverse('answers-list', kwargs={'test_hash': self.hash, 'question_pk': self.question_id}),
+            data=payload,
+            **headers_admin
+        )
+        self.assertWrongResp(resp, 403)
+
+        resp = self.client.post(
+            reverse('answers-list', kwargs={'test_hash': self.hash, 'question_pk': self.question_id}),
+            data=payload,
+            **headers
+        )
+        self.assertResp(resp)
+
+        resp = self.client.get(reverse('questions-detail', kwargs={'test_hash': self.hash, 'pk': self.question_id}))
+        question_after = self.assertResp(resp)
+
+        self.assertTrue(len(question_after["answers"]) - len(question_before["answers"]) == 1)
+
+    def test_update(self):
+        headers = get_auth_headers(self.client, **self.CREDENTIALS)
+        headers_admin = get_auth_headers(self.client, **self.CREDENTIALS_ADMIN)
+
+        resp = self.client.get(reverse('questions-detail', kwargs={'test_hash': self.hash, 'pk': self.question_id}))
+        question_before = self.assertResp(resp)
+        answer_id = choice(question_before["answers"])["id"]
+
+        payload = self.get_payload(self.params_n)
+
+        resp = self.client.put(
+            reverse(
+                'answers-detail',
+                kwargs={'test_hash': self.hash, 'question_pk': self.question_id, 'pk': answer_id}
+            ),
+            data=payload,
+            **headers_admin
+        )
+        self.assertWrongResp(resp, 403)
+
+        resp = self.client.put(
+            reverse(
+                'answers-detail',
+                kwargs={'test_hash': self.hash, 'question_pk': self.question_id, 'pk': answer_id}
+            ),
+            data=payload,
+            **headers
+        )
+        self.assertResp(resp)
+
+        resp = self.client.get(reverse(
+            'answers-detail',
+            kwargs={'test_hash': self.hash, 'question_pk': self.question_id, 'pk': answer_id}
+        ))
+        new_answer = self.assertResp(resp)
+        self.assertEqual(new_answer["text"], payload["text"])
+
+    def test_delete(self):
+        headers = get_auth_headers(self.client, **self.CREDENTIALS)
+        headers_admin = get_auth_headers(self.client, **self.CREDENTIALS_ADMIN)
+
+        resp = self.client.get(reverse('questions-detail', kwargs={'test_hash': self.hash, 'pk': self.question_id}))
+        question_before = self.assertResp(resp)
+        answer_id = choice(question_before["answers"])["id"]
+
+        resp = self.client.delete(reverse(
+            'answers-detail',
+            kwargs={'test_hash': self.hash, 'question_pk': self.question_id, 'pk': answer_id}
+        ), **headers_admin)
+        self.assertWrongResp(resp, 403)
+
+        resp = self.client.delete(reverse(
+            'answers-detail',
+            kwargs={'test_hash': self.hash, 'question_pk': self.question_id, 'pk': answer_id}
+        ), **headers)
+        self.assertResp(resp)
+
+        resp = self.client.get(reverse(
+            'answers-detail',
+            kwargs={'test_hash': self.hash, 'question_pk': self.question_id, 'pk': answer_id}
+        ))
+        self.assertWrongResp(resp, 404)

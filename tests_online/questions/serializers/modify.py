@@ -7,7 +7,7 @@ from .. import models
 class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Answer
-        fields = ('id', 'position', 'params_value')
+        fields = ('id', 'position', 'text', 'params_value')
         read_only_fields = ('id',)
 
 

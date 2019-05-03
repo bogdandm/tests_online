@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 requests = "*"
+tblib = "*"
 
 [packages]
 psycopg2-binary = "*"
