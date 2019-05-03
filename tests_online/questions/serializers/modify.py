@@ -12,10 +12,10 @@ class AnswerSerializer(serializers.ModelSerializer):
 
 
 class QuestionSerializer(NestedCreateMixin, serializers.ModelSerializer):
-    answers = AnswerSerializer(many=True)
+    answers = AnswerSerializer(many=True, required=False)
 
     def update(self, instance, validated_data):
-        validated_data.pop("answers")
+        validated_data.pop("answers", None)
         return super().update(instance, validated_data)
 
     class Meta:
@@ -26,7 +26,7 @@ class QuestionSerializer(NestedCreateMixin, serializers.ModelSerializer):
 
 class TestSerializer(NestedCreateMixin, serializers.ModelSerializer):
     stats_restriction_display = serializers.CharField(source='get_stats_restriction_display', read_only=True)
-    questions = QuestionSerializer(many=True)
+    questions = QuestionSerializer(many=True, required=False)
     owner = serializers.StringRelatedField()
 
     class Meta:
@@ -51,5 +51,5 @@ class TestSerializer(NestedCreateMixin, serializers.ModelSerializer):
         return attrs
 
     def update(self, instance, validated_data):
-        validated_data.pop("questions")
+        validated_data.pop("questions", None)
         return super().update(instance, validated_data)

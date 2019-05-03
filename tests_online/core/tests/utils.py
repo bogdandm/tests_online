@@ -15,7 +15,7 @@ class LoggingAPIClient(APIClient):
             data = resp.json()
         except:
             data = resp.content
-        data = json.dumps(data, ensure_ascii=False, sort_keys=True)
+        data = json.dumps(data, ensure_ascii=False, sort_keys=True, default=str)
         print(f" => {resp.status_code} {data[:50]}{'...' if len(data) > 50 else ''}")
         return resp
 
@@ -25,17 +25,14 @@ def get_by_dict_path(data: dict, path):
 
 
 class APITestCaseEx(APITestCase):
-    credentials = {"username": "admin", "password": "asdfGDFHdsfhadfhHSER"}
-    auto_login = False
     client_class = LoggingAPIClient
 
     def assertResp(self, resp):
         self.assertEqual(resp.status_code // 100, 2, resp.content.decode())
         try:
-            data = resp.json()
-        except Exception as e:
-            raise e
-        return data
+            return resp.json()
+        except:
+            return resp.content.decode()
 
     def assertWrongResp(self, resp, code=None):
         if code is None:
@@ -52,6 +49,23 @@ class APITestCaseEx(APITestCase):
     def assertBulk(self, data: list, path: str, value: Any):
         return all(get_by_dict_path(item, path) == value for item in data)
 
-    def setUp(self):
-        if self.auto_login:
-            self.client.login(**self.credentials)
+
+TEST_SETTINGS = dict(
+    MIDDLEWARE=[
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'core.middleware.UTF8Middleware'
+    ],
+    INSTALLED_APPS=[
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+
+        'rest_framework',
+        'rest_framework.authtoken',
+
+        'core',
+        'questions'
+    ]
+)

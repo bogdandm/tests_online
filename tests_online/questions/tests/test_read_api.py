@@ -4,30 +4,12 @@ from django.test import override_settings
 from django.urls import reverse
 
 from auth.test_utils import get_auth_headers
-from core.tests.utils import APITestCaseEx
+from core.tests.utils import APITestCaseEx, TEST_SETTINGS
 from .data_setup import QuestionsTestData
 from .. import models
 
 
-@override_settings(
-    MIDDLEWARE=[
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.common.CommonMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'core.middleware.UTF8Middleware'
-    ],
-    INSTALLED_APPS=[
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-
-        'rest_framework',
-        'rest_framework.authtoken',
-
-        'core',
-        'questions'
-    ]
-)
+@override_settings(**TEST_SETTINGS)
 class TestReadApi(QuestionsTestData, APITestCaseEx):
     def test_list(self):
         resp = self.client.get(reverse('tests-list'))
@@ -50,25 +32,7 @@ class TestReadApi(QuestionsTestData, APITestCaseEx):
             self.assertTrue(all(q["answers"] for q in test["questions"]))
 
 
-@override_settings(
-    MIDDLEWARE=[
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.common.CommonMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'core.middleware.UTF8Middleware'
-    ],
-    INSTALLED_APPS=[
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-
-        'rest_framework',
-        'rest_framework.authtoken',
-
-        'core',
-        'questions'
-    ]
-)
+@override_settings(**TEST_SETTINGS)
 class QuestionTestApi(QuestionsTestData, APITestCaseEx):
     def test_list(self):
         test_hash = self.private_test.hash
@@ -84,25 +48,7 @@ class QuestionTestApi(QuestionsTestData, APITestCaseEx):
         self.assertTrue(question)
 
 
-@override_settings(
-    MIDDLEWARE=[
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.common.CommonMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'core.middleware.UTF8Middleware'
-    ],
-    INSTALLED_APPS=[
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-
-        'rest_framework',
-        'rest_framework.authtoken',
-
-        'core',
-        'questions'
-    ]
-)
+@override_settings(**TEST_SETTINGS)
 class AnswersTestApi(QuestionsTestData, APITestCaseEx):
     def test_list(self):
         test_hash = self.private_test.hash
