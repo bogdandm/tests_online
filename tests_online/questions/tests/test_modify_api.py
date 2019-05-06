@@ -7,6 +7,8 @@ from django.urls import reverse
 from auth.test_utils import get_auth_headers
 from core.tests import random_text
 from core.tests.utils import APITestCaseEx, TEST_SETTINGS
+from .data_setup import QuestionsTestData
+from .. import models
 
 
 def get_test_payload(is_private=False, params=None, stats_restriction="off"):
@@ -333,3 +335,60 @@ class AnswersModifyApi(APITestCaseEx):
             kwargs={'test_hash': self.hash, 'question_pk': self.question_id, 'pk': answer_id}
         ))
         self.assertWrongResp(resp, 404)
+
+
+@override_settings(**TEST_SETTINGS)
+class UsersAnswersApi(QuestionsTestData, APITestCaseEx):
+    def test_give_single_answer(self):
+        headers = get_auth_headers(self.client, **self.CREDENTIALS)
+        test = models.Test.objects.first()
+        question = test.questions.first()
+        answer = question.answers.first()
+
+        resp = self.client.post(reverse(
+            'answers-give',
+            kwargs={'test_hash': test.hash, 'question_pk': question.id, 'pk': answer.id}
+        ), **headers)
+        self.assertResp(resp)
+
+    def test_give_multiple_answers(self):
+        headers = get_auth_headers(self.client, **self.CREDENTIALS)
+        test = models.Test.objects.first()
+
+        for question in test.questions.iterator():
+            answer = question.answers.first()
+            resp = self.client.post(reverse(
+                'answers-give',
+                kwargs={'test_hash': test.hash, 'question_pk': question.id, 'pk': answer.id}
+            ), **headers)
+            self.assertResp(resp)
+
+        self.assertEqual(
+            test.questions.count(),
+            models.UserAnswers.objects.get(user__username=self.CREDENTIALS["username"], test=test).choices.count()
+        )
+
+    def test_give_multiple_answers_and_change(self):
+        headers = get_auth_headers(self.client, **self.CREDENTIALS)
+        test = models.Test.objects.first()
+
+        for question in test.questions.iterator():
+            answer = question.answers.first()
+            resp = self.client.post(reverse(
+                'answers-give',
+                kwargs={'test_hash': test.hash, 'question_pk': question.id, 'pk': answer.id}
+            ), **headers)
+            self.assertResp(resp)
+
+        for question in list(test.questions.all())[::-1]:
+            answer = question.answers.last()
+            resp = self.client.post(reverse(
+                'answers-give',
+                kwargs={'test_hash': test.hash, 'question_pk': question.id, 'pk': answer.id}
+            ), **headers)
+            self.assertResp(resp)
+
+        self.assertEqual(
+            test.questions.count(),
+            models.UserAnswers.objects.get(user__username=self.CREDENTIALS["username"], test=test).choices.count()
+        )

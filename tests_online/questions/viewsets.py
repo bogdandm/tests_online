@@ -1,4 +1,6 @@
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
 from core.permissions import ActionCombiner, AndCombiner as And, BasePermissionEx, ObjectOwner
@@ -57,6 +59,7 @@ class CreateTestPartPermission(BasePermissionEx):
 
 class QuestionsViewSet(viewsets.ModelViewSet):
     queryset = models.Question.objects.all()
+
     modify_permission = And(permissions.IsAuthenticated, ObjectOwner('test.owner'))
     permission_classes = [ActionCombiner({
         'list': True,
@@ -92,6 +95,7 @@ class QuestionsViewSet(viewsets.ModelViewSet):
 
 class AnswersViewSet(viewsets.ModelViewSet):
     queryset = models.Answer.objects.all()
+
     modify_permission = And(permissions.IsAuthenticated, ObjectOwner('question.test.owner'))
     permission_classes = [ActionCombiner({
         'list': True,
@@ -101,6 +105,8 @@ class AnswersViewSet(viewsets.ModelViewSet):
         'update': modify_permission,
         'partial_update': modify_permission,
         'destroy': modify_permission,
+
+        'give': permissions.IsAuthenticated
     })]
 
     def filter_queryset(self, queryset):
@@ -120,3 +126,26 @@ class AnswersViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save(question_id=self.kwargs["question_pk"])
+
+    @action(detail=True, methods=['post'])
+    def give(self, request, **pks):
+        """
+        Give answer with given pk as answer for question
+        """
+        answer = self.get_object()
+        user = request.user
+        question_id = answer.question_id
+        test_id = models.Test.objects.filter(questions__id=question_id).values_list("id", flat=True)[0]
+
+        answers_set: models.UserAnswers = models.UserAnswers.objects.filter(user=user, test_id=test_id).first()
+        updated = False
+        if answers_set is None:
+            answers_set = models.UserAnswers.objects.create(user=user, test_id=test_id)
+        else:
+            old_answer = answers_set.choices.filter(question_id=question_id).first()
+            if old_answer is not None:
+                updated = True
+                answers_set.choices.remove(old_answer)
+        answers_set.choices.add(answer)
+
+        return Response({"status": "added" if not updated else "updated"}, status=status.HTTP_201_CREATED)
