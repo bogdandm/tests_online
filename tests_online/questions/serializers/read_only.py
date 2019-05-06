@@ -7,7 +7,7 @@ class AnswerReadOnlySerializer(serializers.ModelSerializer):
     is_user_answer = serializers.SerializerMethodField()
 
     def get_is_user_answer(self, answer: models.Answer):
-        user_answers: models.UserAnswers = self.context["user_answers"]
+        user_answers: models.UserAnswers = self.context.get("user_answers", None)
         return user_answers and user_answers.choices.filter(pk=answer.pk).exists()
 
     class Meta:
