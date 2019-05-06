@@ -4,10 +4,11 @@ from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
 from core.permissions import ActionCombiner, AndCombiner as And, BasePermissionEx, ObjectOwner
+from core.views import CachedObjectMixin
 from . import models, serializers
 
 
-class TestsViewSet(viewsets.ModelViewSet):
+class TestsViewSet(viewsets.ModelViewSet, CachedObjectMixin):
     queryset = models.Test.objects.all()
     lookup_url_kwarg = 'hash'
     lookup_field = 'hash'
@@ -45,6 +46,17 @@ class TestsViewSet(viewsets.ModelViewSet):
             "update": serializers.TestSerializer,
             "partial_update": serializers.TestSerializer
         }.get(self.action, Serializer)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        if self.action == "retrieve" and self.request.user and not self.request.user.is_anonymous:
+            test = self.get_object()
+            user = self.request.user
+            user_answers = models.UserAnswers.objects.filter(test=test, user=user).first()
+        else:
+            user_answers = None
+        context["user_answers"] = user_answers
+        return context
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

@@ -4,9 +4,15 @@ from .. import models
 
 
 class AnswerReadOnlySerializer(serializers.ModelSerializer):
+    is_user_answer = serializers.SerializerMethodField()
+
+    def get_is_user_answer(self, answer: models.Answer):
+        user_answers: models.UserAnswers = self.context["user_answers"]
+        return user_answers and user_answers.choices.filter(pk=answer.pk).exists()
+
     class Meta:
         model = models.Answer
-        fields = ('id', 'position', 'text', 'params_value')
+        fields = ('id', 'position', 'text', 'params_value', 'is_user_answer')
 
 
 class QuestionReadOnlySerializer(serializers.ModelSerializer):
