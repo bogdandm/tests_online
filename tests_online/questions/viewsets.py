@@ -1,3 +1,4 @@
+from django.http import Http404
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -20,6 +21,7 @@ class TestsViewSet(viewsets.ModelViewSet, CachedObjectMixin):
         'update': And(permissions.IsAuthenticated, ObjectOwner()),
         'partial_update': And(permissions.IsAuthenticated, ObjectOwner()),
         'destroy': And(permissions.IsAuthenticated, ObjectOwner()),
+        'results': permissions.IsAuthenticated
     })]
 
     def filter_queryset(self, queryset):
@@ -44,15 +46,23 @@ class TestsViewSet(viewsets.ModelViewSet, CachedObjectMixin):
             "create": serializers.TestSerializer,
             "retrieve": serializers.TestReadOnlySerializer,
             "update": serializers.TestSerializer,
-            "partial_update": serializers.TestSerializer
+            "partial_update": serializers.TestSerializer,
+            "results": serializers.TestResultsSerializer
         }.get(self.action, Serializer)
+
+    def get_user_answers(self):
+        user_answers = getattr(self, '_get_user_answers_cache', None)
+        if user_answers is None:
+            test = self.get_object()
+            user = self.request.user
+            user_answers = models.UserAnswers.objects.filter(test=test, user=user).first()
+            setattr(self, '_get_user_answers_cache', user_answers)
+        return user_answers
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
         if self.action == "retrieve" and self.request.user and not self.request.user.is_anonymous:
-            test = self.get_object()
-            user = self.request.user
-            user_answers = models.UserAnswers.objects.filter(test=test, user=user).first()
+            user_answers = self.get_user_answers()
         else:
             user_answers = None
         context["user_answers"] = user_answers
@@ -60,6 +70,26 @@ class TestsViewSet(viewsets.ModelViewSet, CachedObjectMixin):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+    @action(detail=True, methods=['get'])
+    def results(self, request, hash=None):
+        test = self.get_object()
+        user_answers = self.get_user_answers()
+        if user_answers is None:
+            raise Http404
+
+        is_complete = test.questions.count() == user_answers.choices.count()
+        results = [0.0 for param in test.params]
+        for answer in user_answers.choices.iterator():
+            for i, item in enumerate(answer.params_value):
+                results[i] += item
+
+        serializer = serializers.TestResultsSerializer(data={
+            "is_complete": is_complete,
+            "results": dict(zip(test.params, results))
+        })
+        serializer.is_valid()
+        return Response(serializer.data)
 
 
 class CreateTestPartPermission(BasePermissionEx):

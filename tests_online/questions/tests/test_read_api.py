@@ -1,4 +1,5 @@
 import operator
+from random import choice
 
 from django.test import override_settings
 from django.urls import reverse
@@ -30,6 +31,20 @@ class TestReadApi(QuestionsTestData, APITestCaseEx):
             test = self.assertResp(resp)
             self.assertTrue(test["questions"])
             self.assertTrue(all(q["answers"] for q in test["questions"]))
+
+    def test_results(self):
+        user = self.user
+        test = models.Test.objects.first()
+        user_answers = models.UserAnswers.objects.create(user=user, test=test)
+        for question in test.questions.iterator():
+            answer = choice(question.answers.all())
+            user_answers.choices.add(answer)
+
+        headers = get_auth_headers(self.client, **self.CREDENTIALS)
+        resp = self.client.get(reverse('tests-results', kwargs={'hash': test.hash}), **headers)
+        results = self.assertResp(resp)
+        self.assertTrue(results["is_complete"])
+        self.assertTrue(results["results"] and all(map(lambda x: isinstance(x, float), results["results"].values())))
 
 
 @override_settings(**TEST_SETTINGS)

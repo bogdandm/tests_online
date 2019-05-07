@@ -40,3 +40,8 @@ class TestReadOnlyShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Test
         fields = ('id', 'url', 'hash', 'title', 'params', 'stats_restriction', 'owner')
+
+
+class TestResultsSerializer(serializers.Serializer):
+    is_complete = serializers.BooleanField()
+    results = serializers.JSONField()
