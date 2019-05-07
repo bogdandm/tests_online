@@ -57,6 +57,11 @@ services:
     #    command: tail -f /dev/null
     command: ./wait-for-it.sh db:5432 redis:6379 -- /opt/tests_online/tests_online_docker/django/run_django.sh
     container_name: tests-online-django
+    healthcheck:
+      test: ["CMD-SHELL", "./wait-for-it.sh localhost:2021"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
   django-migrate:
     image: tests-online-django:latest
