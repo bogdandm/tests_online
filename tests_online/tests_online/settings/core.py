@@ -8,6 +8,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'h2&&$gkv48p&!_d1a)u)rqh_qjc_j1*)4rtc9
 
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
+CORS_ORIGIN_ALLOW_ALL = DEBUG
 ALLOWED_HOSTS = ["*"]
 SITE_ID = 1
 
@@ -21,12 +22,14 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'drf_yasg',
+    'corsheaders',
 
     'core',
     'questions'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

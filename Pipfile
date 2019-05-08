@@ -22,6 +22,7 @@ uwsgi = "*"
 djangorestframework-simplejwt = "*"
 drf-writable-nested = "*"
 drf-nested-routers = "*"
+django-cors-headers = "*"
 
 [requires]
 python_version = "3.7"
