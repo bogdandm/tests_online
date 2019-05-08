@@ -10,7 +10,9 @@ __pycache__/
 
 *.log
 *.key
+*.tmp
 *.lock
+!yarn.lock
 !Pipfile.lock
 *.pid
 .coverage
@@ -25,3 +27,23 @@ media/
 
 celerybeat-schedule
 .test/
+
+# Frontend
+# dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# production
+/tests_online_frontend/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
