@@ -1,3 +1,4 @@
+from django.db.models import Count, F, Q
 from django.http import Http404
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
@@ -10,9 +11,9 @@ from . import models, serializers
 
 
 class TestsViewSet(viewsets.ModelViewSet, CachedObjectMixin):
-    queryset = models.Test.objects.all()
     lookup_url_kwarg = 'hash'
     lookup_field = 'hash'
+
     permission_classes = [ActionCombiner({
         'list': True,
         'retrieve': True,
@@ -24,19 +25,31 @@ class TestsViewSet(viewsets.ModelViewSet, CachedObjectMixin):
         'results': permissions.IsAuthenticated
     })]
 
-    def filter_queryset(self, queryset):
+    def get_queryset(self):
+        queryset = models.Test.objects.all()
+
         if self.action == "list":
-            qs = queryset.filter(is_private=False)
             if self.request.auth:
                 user = self.request.auth.user
             elif self.request.user:
                 user = self.request.user
             else:
-                return qs
+                user = None
 
-            if not user.is_anonymous:
-                return qs | queryset.filter(is_private=True, owner=user)
-            return qs
+            queryset = queryset.annotate(
+                questions_number=Count('questions'),
+                owner_name=F('owner__username')
+            )
+            if user and not user.is_anonymous:
+                queryset = queryset.annotate(user_answers=Count(
+                    'answers_set__choices',
+                    filter=Q(answers_set__user_id=user.id)
+                ))
+                return queryset.filter(is_private=False) | queryset.filter(is_private=True, owner_id=user.id)
+            else:
+                return queryset.filter(is_private=False)
+        elif self.action == "retrieve":
+            return queryset.prefetch_related("questions__answers")
         else:
             return queryset
 

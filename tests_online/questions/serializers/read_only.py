@@ -35,11 +35,17 @@ class TestReadOnlySerializer(serializers.ModelSerializer):
 
 class TestReadOnlyShortSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='tests-detail', read_only=True, lookup_field='hash')
-    owner = serializers.StringRelatedField()
+    owner = serializers.CharField(source="owner_name")
+    questions_number = serializers.IntegerField()
+    user_answers = serializers.SerializerMethodField()
+
+    def get_user_answers(self, test: models.Test):
+        return getattr(test, 'user_answers', None)
 
     class Meta:
         model = models.Test
-        fields = ('id', 'url', 'hash', 'title', 'params', 'stats_restriction', 'owner')
+        fields = ('id', 'url', 'hash', 'title', 'description', 'params', 'stats_restriction', 'owner',
+                  'questions_number', 'user_answers',)
 
 
 class TestResultsSerializer(serializers.Serializer):

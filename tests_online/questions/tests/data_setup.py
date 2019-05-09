@@ -17,7 +17,9 @@ class QuestionsTestData(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.User = get_user_model()
-        cls.user = cls.User.objects.create_superuser(**cls.CREDENTIALS)
+        cls.user = cls.User.objects.filter(username=cls.CREDENTIALS["username"]).first()
+        if cls.user is None:
+            cls.user = cls.User.objects.create_superuser(**cls.CREDENTIALS)
 
         cls.public_test: models.Test
         cls.private_test: models.Test

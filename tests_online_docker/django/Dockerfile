@@ -23,4 +23,5 @@ RUN chmod +x wait-for-it.sh
 COPY Pipfile* ./
 RUN pipenv install --system --deploy --ignore-pipfile --dev
 
-COPY . ./
+COPY tests_online ./tests_online/
+COPY tests_online_docker ./tests_online_docker/
