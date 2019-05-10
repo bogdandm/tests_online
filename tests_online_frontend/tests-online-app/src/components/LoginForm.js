@@ -7,13 +7,13 @@ import rest from "../rest";
 
 
 const mapStateToProps = state => {
-    return {auth: state.auth, ...state.forms.user};
+    return {auth: state.auth, api_auth: state.api_auth, ...state.forms.user};
 };
 
 
 class ConnectedLoginForm extends Component {
     handleSubmit(user) {
-        this.props.dispatch(rest.actions.auth.obtain(
+        this.props.dispatch(rest.actions.api_auth.obtain(
             user.username, user.password
         ));
     }
@@ -48,7 +48,7 @@ class ConnectedLoginForm extends Component {
                                                    component={ui.Input} placeholder="Password"/>
                                 </ui.Form.Field>
                                 <ui.Button type='button' disabled style={{transform: "scale(0)"}}>-</ui.Button>
-                                <ui.Button type='submit' floated="right" primary loading={this.props.auth.loading}>
+                                <ui.Button type='submit' floated="right" primary loading={this.props.api_auth.loading}>
                                     Log in
                                 </ui.Button>
                             </Form>

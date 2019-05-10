@@ -6,18 +6,18 @@ import rest from "../rest";
 import {TestListItem} from "./TestListItem"
 
 const mapStateToProps = state => {
-    return {tests: state.tests};
+    return {api_tests: state.api_tests};
 };
 
 export class ConnectedTestsList extends Component {
     componentDidMount() {
-        this.props.dispatch(rest.actions.tests.list());
+        this.props.dispatch(rest.actions.api_tests.list());
     }
 
     render() {
         return (
             <ui.List divided relaxed>
-                {this.props.tests.data.map(
+                {this.props.api_tests.data.map(
                     test => <TestListItem key={test.id} {...test} />)
                 }
             </ui.List>

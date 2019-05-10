@@ -23,7 +23,7 @@ const paginator = (data, prevData, action) => {
 };
 
 export default reduxApi({
-    auth: {
+    api_auth: {
         url: `/api/v1/auth/token/:action/`,
         helpers: {
             obtain(username, password) {
@@ -46,7 +46,7 @@ export default reduxApi({
             }
         }
     },
-    tests: {
+    api_tests: {
         url: `api/v1/tests/`,
         helpers: {
             list(page = 1) {
@@ -61,7 +61,7 @@ export default reduxApi({
         },
         transformer: paginator
     },
-    test: {
+    api_test: {
         url: `api/v1/tests/:id`,
         helpers: {
             retrieve(id) {
@@ -74,13 +74,13 @@ export default reduxApi({
             }
         }
     }
-})
+}, {prefix: "api."})
     .use("fetch", adapterAxios)
     .use("rootUrl", "http://localhost:8000")
     .use("options", (url, params, getState) => {
         const state = getState();
         return {
             'Accept': 'application/json',
-            ...(state.auth.data.access ? {'Authorization': `Bearer ${state.auth.data.access}`} : {})
+            ...(state.auth.access ? {'Authorization': `Bearer ${state.auth.access}`} : {})
         }
     });

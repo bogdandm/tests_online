@@ -6,9 +6,7 @@ import * as ui from "semantic-ui-react";
 import Auth from "./Auth";
 
 
-const mapStateToProps = state => {
-    return state;
-};
+const mapStateToProps = state => state;
 
 export class ConnectedTopBar extends Component {
     render() {

@@ -5,13 +5,21 @@ import rest, {stateAsyncFactory} from "./rest";
 
 
 export const initialState = {
-    auth: stateAsyncFactory({
+    auth: {
+        access: null,
+        refresh: null,
+        username: "username"
+    },
+
+    api_auth: stateAsyncFactory({
         access: null,
         refresh: null
     }),
-    tests: stateAsyncFactory([]),
-    test: stateAsyncFactory(null),
+    api_tests: stateAsyncFactory([]),
+    api_test: stateAsyncFactory(null),
+
     forms: {
+        // TODO: Rename to LogIn
         user: {
             username: '',
             password: ''
@@ -22,21 +30,25 @@ export const initialState = {
 export function setRestInitialState(initialState) {
     return (state) => {
         const newState = _.chain(state).defaults(initialState).cloneDeep().value();
-        newState.tests.data = _.isEmpty(newState.tests.data) ? initialState.tests.data : newState.tests.data;
+        newState.api_tests.data = _.isEmpty(newState.api_tests.data)
+            ? initialState.api_tests.data
+            : newState.api_tests.data;
         return newState;
     }
 }
 
-export function auth(state, action) {
+export function authGlobal(state, action) {
     state = _.cloneDeep(state);
     switch (action.type) {
-        case rest.events.auth.actionFetch:
+        case rest.events.api_auth.actionFetch:
             state.forms.user.password = "";
             return state;
 
-        case rest.events.auth.actionSuccess:
-            if (action.request.pathvars.action === "obtain")
+        case rest.events.api_auth.actionSuccess:
+            if (action.request.pathvars.action === "obtain") {
                 localStorage.setItem("AUTH", JSON.stringify(action.data));
+                state.auth = {...state.auth, ...action.data};
+            }
             return state;
 
         case actions.auth.load:
@@ -44,7 +56,7 @@ export function auth(state, action) {
             if (authInit) {
                 try {
                     authInit = JSON.parse(authInit);
-                    state.auth.data = authInit;
+                    state.auth = {...state.auth, ...authInit};
                 } catch (e) {
                     authInit = null;
                     localStorage.removeItem("AUTH")
@@ -53,7 +65,7 @@ export function auth(state, action) {
             return state;
 
         case actions.auth.logout:
-            state.auth.data = initialState.auth.data;
+            state.auth = initialState.auth;
             localStorage.removeItem("AUTH");
             return state;
 

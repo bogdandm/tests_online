@@ -6,12 +6,12 @@ import * as ui from "semantic-ui-react";
 import rest from "../rest";
 
 const mapStateToProps = state => {
-    return {...state.test};
+    return {...state.api_test};
 };
 
 export class ConnectedTestDetail extends Component {
     componentDidMount() {
-        this.props.dispatch(rest.actions.test.retrieve(this.props.match.params.hash));
+        this.props.dispatch(rest.actions.api_test.retrieve(this.props.match.params.hash));
     }
 
     render() {

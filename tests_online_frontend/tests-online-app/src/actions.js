@@ -16,8 +16,8 @@ export const creators = {
         load: generateCreator(actions.auth.load),
         loadAndVerify: () => (dispatch, getState) => {
             dispatch({type: actions.auth.load});
-            const accessToken = getState().auth.data.access;
-            accessToken && dispatch(rest.actions.auth.verify(accessToken));
+            const accessToken = getState().auth.access;
+            accessToken && dispatch(rest.actions.api_auth.verify(accessToken));
         },
         logout: generateCreator(actions.auth.logout)
     }
