@@ -20,7 +20,7 @@ schema_view = get_schema_view(
 )
 
 apipatterns = [
-    path('', include('auth.urls')),
+    path('auth/', include('auth.urls')),
     path('', include('questions.urls')),
 ]
 
