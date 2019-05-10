@@ -18,6 +18,10 @@ class ConnectedLoginForm extends Component {
         ));
     }
 
+    componentWillUnmount() {
+        this.props.onClose()
+    }
+
     render() {
         return (
             <ui.TransitionablePortal open={this.props.open} transition={{

@@ -17,6 +17,11 @@ export function stateAsyncFactory(nested) {
 
 }
 
+const paginator = (data, prevData, action) => {
+    data || (data = {"results": []});
+    return data.results
+};
+
 export default reduxApi({
     auth: {
         url: `/api/v1/auth/token/:action/`,
@@ -27,6 +32,15 @@ export default reduxApi({
                     {
                         method: "POST",
                         data: {username, password}
+                    }
+                ]
+            },
+            verify(token) {
+                return [
+                    {action: "verify"},
+                    {
+                        method: "POST",
+                        data: {token}
                     }
                 ]
             }
@@ -45,10 +59,7 @@ export default reduxApi({
                 ]
             }
         },
-        transformer: (data, prevData, action) => {
-            data || (data = {"results": []});
-            return data.results
-        }
+        transformer: paginator
     },
     test: {
         url: `api/v1/tests/:id`,
@@ -71,13 +82,5 @@ export default reduxApi({
         return {
             'Accept': 'application/json',
             ...(state.auth.data.access ? {'Authorization': `Bearer ${state.auth.data.access}`} : {})
-        }
-    })
-    .use("responseHandler", (err, data) => {
-        if (err) {
-            console.warn("API Error: ", err);
-        } else {
-            console.info("API response: ", data);
-            return data.data
         }
     });

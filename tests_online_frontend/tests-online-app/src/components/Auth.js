@@ -16,7 +16,7 @@ class ConnectedAuth extends Component {
     state = {open: null};
 
     componentDidMount() {
-        this.props.dispatch(creators.auth.load())
+        this.props.dispatch(creators.auth.loadAndVerify())
     }
 
     handleLogout() {
@@ -36,18 +36,15 @@ class ConnectedAuth extends Component {
                 </ui.Dropdown.Menu>
             </ui.Dropdown>
         ) : (
-            <ui.Menu.Item position="right">
-                <ui.Button.Group>
-                    <ui.Button onClick={this.openLoginForm}>
-                        Log in
-                    </ui.Button>
-                    <ui.Button primary>
-                        Signup
-                    </ui.Button>
-
+            <ui.Menu.Menu position='right'>
+                <ui.Menu.Item onClick={this.openLoginForm}>
+                    Log in
                     <LoginForm open={this.state.open === "LoginForm"} onClose={this.closeAny}/>
-                </ui.Button.Group>
-            </ui.Menu.Item>
+                </ui.Menu.Item>
+                <ui.Menu.Item onClick={null}>
+                    Signup
+                </ui.Menu.Item>
+            </ui.Menu.Menu>
         )
     }
 }
