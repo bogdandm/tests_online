@@ -1,6 +1,7 @@
 import rest from "./rest"
 
 export const actions = {
+    forceUpdate: "FORCE_UPDATE", // Force redraw of main app view (everything except TopBar)
     auth: {
         load: "AUTH_LOAD",
         logout: "AUTH_LOGOUT"
@@ -12,6 +13,7 @@ const generateCreator = (action) => () => {
 };
 
 export const creators = {
+    forceUpdate: generateCreator(actions.forceUpdate),
     auth: {
         load: generateCreator(actions.auth.load),
         loadAndVerify: () => (dispatch, getState) => {

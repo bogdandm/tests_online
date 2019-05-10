@@ -11,6 +11,7 @@ const mapStateToProps = state => {
 
 export class ConnectedTestsList extends Component {
     componentDidMount() {
+        rest.actions.api_tests.abort();
         this.props.dispatch(rest.actions.api_tests.list());
     }
 

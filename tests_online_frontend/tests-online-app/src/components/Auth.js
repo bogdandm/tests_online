@@ -5,10 +5,10 @@ import * as ui from "semantic-ui-react";
 import {creators} from "../actions";
 import LoginForm from "./LoginForm";
 
+
 const mapStateToProps = state => {
     return {auth: state.auth};
 };
-
 
 class ConnectedAuth extends Component {
     state = {open: null};
@@ -23,7 +23,6 @@ class ConnectedAuth extends Component {
 
     openLoginForm = () => this.setState({open: "LoginForm"});
     closeAny = () => {
-        console.debug("CLOSE");
         this.setState({open: null});
     };
 

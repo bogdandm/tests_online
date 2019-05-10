@@ -5,6 +5,8 @@ import rest, {stateAsyncFactory} from "./rest";
 
 
 export const initialState = {
+    uiKey: 1,
+
     auth: {
         access: null,
         refresh: null,
@@ -45,11 +47,17 @@ export function authGlobal(state, action) {
             return state;
 
         case rest.events.api_auth.actionSuccess:
-            if (action.request.pathvars.action === "obtain") {
-                localStorage.setItem("AUTH", JSON.stringify(action.data));
-                state.auth = {...state.auth, ...action.data};
+            switch (action.request.pathvars.action) {
+                case "refresh":
+                case "obtain":
+                    localStorage.setItem("AUTH", JSON.stringify(action.data));
+                    state.auth = {...state.auth, ...action.data};
+                    return state;
+
+                default:
+                    return state;
             }
-            return state;
+
 
         case actions.auth.load:
             let authInit = localStorage.getItem("AUTH");
@@ -67,6 +75,18 @@ export function authGlobal(state, action) {
         case actions.auth.logout:
             state.auth = initialState.auth;
             localStorage.removeItem("AUTH");
+            return state;
+
+        default:
+            return state;
+    }
+}
+
+export function globalReducer(state, action) {
+    state = _.cloneDeep(state);
+    switch (action.type) {
+        case actions.forceUpdate:
+            state.uiKey++;
             return state;
 
         default:

@@ -1,19 +1,32 @@
 import _ from "lodash";
 import {combineForms} from "react-redux-form";
 import {applyMiddleware, combineReducers, createStore} from "redux";
+import {async} from "redux-api";
 import logger from "redux-logger";
 import thunk from "redux-thunk";
 
-import {authGlobal, initialState, setRestInitialState} from "./reducers";
+import {creators} from "./actions";
+import {authGlobal, globalReducer, initialState, setRestInitialState} from "./reducers";
 import rest from "./rest";
 
 let store;
+let restApi = rest.use("responseHandler", function (error, response) {
+    const state = store.getState();
 
+    if (error) {
+        if (error.response.status === 401 && error.response.data.code === "token_not_valid") {
+            async(
+                store.dispatch,
+                (cb) => {
+                    return rest.actions.api_auth_refresh.refresh(state.auth.refresh, cb)
+                }
+            ).then((data) => store.dispatch(creators.forceUpdate()));
 
-// TODO: Handle broken tokens
-let restApi = rest.use("responseHandler", (err, response) => {
-    if (err) {
-        console.warn("API Error: ", err);
+            throw error;
+        } else {
+            console.warn("API Error: ", error);
+            throw error;
+        }
     } else {
         console.info("API response: ", response);
         return response.data
@@ -23,11 +36,17 @@ let restApi = rest.use("responseHandler", (err, response) => {
 const autoReducer = combineReducers({
     ...restApi.reducers,
     forms: combineForms({user: initialState.forms.user}, 'forms'),
-    auth: (auth) => _.chain(auth).cloneDeep().defaults(initialState.auth).value()
+    auth: (auth) => _.chain(auth).cloneDeep().defaults(initialState.auth).value(),
+    uiKey: (key) => key || 1
 });
 
 function reducer(state, action) {
-    return [state, autoReducer, authGlobal, setRestInitialState(initialState)].reduce((state, fn) => {
+    return [
+        state,
+        autoReducer,
+        authGlobal, globalReducer,
+        setRestInitialState(initialState)
+    ].reduce((state, fn) => {
         return fn(state, action);
     });
 }

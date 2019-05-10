@@ -46,6 +46,21 @@ export default reduxApi({
             }
         }
     },
+    // Duplicate endpoint to prevent race condition in store
+    api_auth_refresh: {
+        url: `/api/v1/auth/token/:action/`,
+        helpers: {
+            refresh(token) {
+                return [
+                    {action: "refresh"},
+                    {
+                        method: "POST",
+                        data: {refresh: token}
+                    }
+                ]
+            }
+        }
+    },
     api_tests: {
         url: `api/v1/tests/`,
         helpers: {
