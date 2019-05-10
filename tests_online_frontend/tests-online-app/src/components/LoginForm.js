@@ -3,7 +3,6 @@ import {connect} from "react-redux";
 import {Control, Form} from "react-redux-form";
 import * as ui from "semantic-ui-react";
 
-
 import rest from "../rest";
 
 

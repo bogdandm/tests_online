@@ -3,6 +3,7 @@ import ReactDOM from "react-dom"
 import {Provider} from "react-redux";
 import {BrowserRouter} from "react-router-dom";
 import {applyMiddleware, createStore} from "redux";
+import logger from 'redux-logger'
 import thunk from "redux-thunk";
 
 import App from "./components/App";
@@ -11,7 +12,7 @@ import reducer, {initialState} from "./reducers";
 import * as serviceWorker from "./serviceWorker";
 
 
-const store = createStore(reducer, initialState, applyMiddleware(thunk));
+const store = createStore(reducer, initialState, applyMiddleware(thunk, logger));
 console.log("Store initial state: ", store.getState());
 
 ReactDOM.render(

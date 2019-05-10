@@ -75,7 +75,7 @@ export default reduxApi({
     })
     .use("responseHandler", (err, data) => {
         if (err) {
-            console.error("API Error: ", err);
+            console.warn("API Error: ", err);
         } else {
             console.info("API response: ", data);
             return data.data

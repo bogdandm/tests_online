@@ -1,7 +1,10 @@
 import _ from "lodash";
 import {combineForms} from "react-redux-form";
 import {combineReducers} from "redux";
+
+import {actions} from "./actions";
 import rest, {stateAsyncFactory} from "./rest";
+
 
 export const initialState = {
     auth: stateAsyncFactory({
@@ -26,16 +29,29 @@ function setRestInitialState(initialState) {
     }
 }
 
-function authGlobal(state, action) {
+function auth(state, action) {
+    state = _.cloneDeep(state);
     switch (action.type) {
         case rest.events.auth.actionFetch:
-        // return {
-        //     ...state,
-        //     form: {
-        //         ...state.form,
-        //         password: null
-        //     }
-        // };
+            state.forms.user.password = "";
+            return state;
+
+        case rest.events.auth.actionSuccess:
+            localStorage.setItem("AUTH", JSON.stringify(action.data));
+            return state;
+
+        case actions.auth.load:
+            let authInit = localStorage.getItem("AUTH");
+            if (authInit) {
+                authInit = JSON.parse(authInit);
+                state.auth.data = authInit;
+            }
+            return state;
+
+        case actions.auth.logout:
+            state.auth.data = initialState.auth.data;
+            localStorage.removeItem("AUTH");
+            return state;
 
         default:
             return state;
@@ -48,7 +64,7 @@ const autoReducer = combineReducers({
 });
 
 function reducer(state, action) {
-    return [state, autoReducer, authGlobal, setRestInitialState(initialState)].reduce((state, fn) => {
+    return [state, autoReducer, auth, setRestInitialState(initialState)].reduce((state, fn) => {
         return fn(state, action);
     });
 }
