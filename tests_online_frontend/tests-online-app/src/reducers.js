@@ -9,6 +9,7 @@ export const initialState = {
         refresh: null
     }),
     tests: stateAsyncFactory([]),
+    test: stateAsyncFactory(null),
     forms: {
         user: {
             username: '',
@@ -28,7 +29,6 @@ function setRestInitialState(initialState) {
 function authGlobal(state, action) {
     switch (action.type) {
         case rest.events.auth.actionFetch:
-            console.log(action);
         // return {
         //     ...state,
         //     form: {

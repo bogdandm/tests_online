@@ -49,6 +49,19 @@ export default reduxApi({
             data || (data = {"results": []});
             return data.results
         }
+    },
+    test: {
+        url: `api/v1/tests/:id`,
+        helpers: {
+            retrieve(id) {
+                return [
+                    {id},
+                    {
+                        method: "GET"
+                    }
+                ]
+            }
+        }
     }
 })
     .use("fetch", adapterAxios)
@@ -62,10 +75,9 @@ export default reduxApi({
     })
     .use("responseHandler", (err, data) => {
         if (err) {
-            console.error(err);
-            return;
+            console.error("API Error: ", err);
         } else {
-            console.info(data);
+            console.info("API response: ", data);
             return data.data
         }
     });

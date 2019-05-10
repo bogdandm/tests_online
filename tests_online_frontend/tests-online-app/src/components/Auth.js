@@ -1,44 +1,46 @@
 import React, {Component} from "react";
 import {connect} from "react-redux";
-import {Control, Form,} from 'react-redux-form';
-
-
-import rest from "../rest";
-
+import * as ui from "semantic-ui-react";
+import LoginForm from "./LoginForm";
 
 const mapStateToProps = state => {
-    return {...state.auth, ...state.forms.user};
+    return {auth: state.auth};
 };
 
 
+// TODO: username
+
 class ConnectedAuth extends Component {
-    handleSubmit(user) {
-        this.props.dispatch(rest.actions.test.list(
-            user.username, user.password
-        ));
-    }
+    state = {open: null};
+
+    openLoginForm = () => this.setState({open: "LoginForm"});
+    closeAny = () => this.setState({open: null});
 
     render() {
+        // noinspection ConstantConditionalExpressionJS
         return (
-            <div>
-                <div>Access token: {this.props.data.access ? this.props.data.access.slice(0, 10) + "..." : ""}</div>
-                <Form
-                    model="forms.user"
-                    onSubmit={(user) => this.handleSubmit(user)}
-                >
-                    <div>
-                        <label htmlFor="user.username">Username:</label>
-                        <Control.text model=".username" id="user.username"/>
-                    </div>
-                    <div>
-                        <label htmlFor="user.password">Password:</label>
-                        <Control.input type="password" model=".password" id="user.password"/>
-                    </div>
-                    <div>
-                        <button type="submit">Log in</button>
-                    </div>
-                </Form>
-            </div>
+            true ? (
+                <ui.Dropdown item text={"username"}>
+                    <ui.Dropdown.Menu>
+                        <ui.Dropdown.Item>
+                            Log out
+                        </ui.Dropdown.Item>
+                    </ui.Dropdown.Menu>
+                </ui.Dropdown>
+            ) : (
+                <ui.Menu.Item position="right">
+                    <ui.Button.Group>
+                        <ui.Button onClick={this.openLoginForm}>
+                            Log in
+                        </ui.Button>
+                        <ui.Button primary>
+                            Signup
+                        </ui.Button>
+
+                        <LoginForm open={this.state.open === "LoginForm"} onClose={this.closeAny}/>
+                    </ui.Button.Group>
+                </ui.Menu.Item>
+            )
         )
     }
 }

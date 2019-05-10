@@ -1,8 +1,9 @@
 import React, {Component} from "react";
 import {connect} from "react-redux";
-import rest from "../../rest";
+import * as ui from "semantic-ui-react";
 
-import {Test} from "./Test"
+import rest from "../rest";
+import {TestListItem} from "./TestListItem"
 
 const mapStateToProps = state => {
     return {tests: state.tests};
@@ -15,11 +16,11 @@ export class ConnectedTestsList extends Component {
 
     render() {
         return (
-            <ul>
+            <ui.List divided relaxed>
                 {this.props.tests.data.map(
-                    test => <Test key={test.id} {...test} />)
+                    test => <TestListItem key={test.id} {...test} />)
                 }
-            </ul>
+            </ui.List>
         );
     }
 }
