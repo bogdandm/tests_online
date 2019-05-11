@@ -13,9 +13,10 @@ export const initialState = {
         username: "username"
     },
 
-    api_auth: stateAsyncFactory({
-        access: null,
-        refresh: null
+    api_user_info: stateAsyncFactory({
+        id: null,
+        username: null,
+        email: null
     }),
     api_tests: stateAsyncFactory([]),
     api_test: stateAsyncFactory(null),
@@ -47,6 +48,7 @@ export function authGlobal(state, action) {
             return state;
 
         case rest.events.api_auth.actionSuccess:
+        case rest.events.api_auth_refresh.actionSuccess:
             switch (action.request.pathvars.action) {
                 case "refresh":
                 case "obtain":

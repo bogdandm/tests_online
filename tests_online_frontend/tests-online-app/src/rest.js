@@ -22,6 +22,13 @@ const paginator = (data, prevData, action) => {
     return data.results
 };
 
+
+function postAuth({data, actions, dispatch, getState, request}) {
+    dispatch(actions.api_user_info());
+}
+
+
+// TODO: Prefix
 export default reduxApi({
     api_auth: {
         url: `/api/v1/auth/token/:action/`,
@@ -44,7 +51,8 @@ export default reduxApi({
                     }
                 ]
             }
-        }
+        },
+        postfetch: [postAuth]
     },
     // Duplicate endpoint to prevent race condition in store
     api_auth_refresh: {
@@ -59,8 +67,10 @@ export default reduxApi({
                     }
                 ]
             }
-        }
+        },
+        postfetch: [postAuth]
     },
+    api_user_info: `/api/v1/auth/user/`,
     api_tests: {
         url: `api/v1/tests/`,
         helpers: {
@@ -95,7 +105,9 @@ export default reduxApi({
     .use("options", (url, params, getState) => {
         const state = getState();
         return {
-            'Accept': 'application/json',
-            ...(state.auth.access ? {'Authorization': `Bearer ${state.auth.access}`} : {})
+            headers: {
+                'Accept': 'application/json',
+                ...(state.auth.access ? {'Authorization': `Bearer ${state.auth.access}`} : {})
+            }
         }
     });

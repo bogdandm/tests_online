@@ -7,7 +7,7 @@ import LoginForm from "./LoginForm";
 
 
 const mapStateToProps = state => {
-    return {auth: state.auth};
+    return {auth: state.auth, user: state.api_user_info};
 };
 
 class ConnectedAuth extends Component {
@@ -28,7 +28,7 @@ class ConnectedAuth extends Component {
 
     render() {
         return this.props.auth.access ? (
-            <ui.Dropdown item text={this.props.auth.username}>
+            <ui.Dropdown item text={this.props.user.data.username} loading={!this.props.user.data.username}>
                 <ui.Dropdown.Menu>
                     <ui.Dropdown.Item onClick={() => this.handleLogout()}>
                         Log out
