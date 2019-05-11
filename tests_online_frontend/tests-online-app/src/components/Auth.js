@@ -4,6 +4,7 @@ import * as ui from "semantic-ui-react";
 
 import {creators} from "../actions";
 import LoginForm from "./LoginForm";
+import SignupForm from "./SignupForm";
 
 
 const mapStateToProps = state => {
@@ -22,6 +23,7 @@ class ConnectedAuth extends Component {
     }
 
     openLoginForm = () => this.setState({open: "LoginForm"});
+    openSignupForm = () => this.setState({open: "SignupForm"});
     closeAny = () => {
         this.setState({open: null});
     };
@@ -40,11 +42,12 @@ class ConnectedAuth extends Component {
                 <ui.Menu.Item onClick={this.openLoginForm}>
                     Log in
                 </ui.Menu.Item>
-                <ui.Menu.Item onClick={null}>
+                <ui.Menu.Item onClick={this.openSignupForm}>
                     Signup
                 </ui.Menu.Item>
 
                 <LoginForm open={this.state.open === "LoginForm"} onClose={this.closeAny}/>
+                <SignupForm open={this.state.open === "SignupForm"} onClose={this.closeAny}/>
             </ui.Menu.Menu>
         )
     }

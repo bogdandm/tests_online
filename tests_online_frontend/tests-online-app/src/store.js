@@ -1,3 +1,4 @@
+import cogoToast from 'cogo-toast';
 import _ from "lodash";
 import {combineForms} from "react-redux-form";
 import {applyMiddleware, combineReducers, createStore} from "redux";
@@ -21,10 +22,10 @@ let restApi = rest.use("responseHandler", function (error, response) {
                     return rest.actions.api_auth_refresh.refresh(state.auth.refresh, cb)
                 }
             ).then((data) => store.dispatch(creators.forceUpdate()));
-
             throw error;
         } else {
             console.warn("API Error: ", error);
+            cogoToast.error(`${error.toString()}: ${error.config.method.toUpperCase()} ${error.config.url}`);
             throw error;
         }
     } else {
@@ -35,7 +36,10 @@ let restApi = rest.use("responseHandler", function (error, response) {
 
 const autoReducer = combineReducers({
     ...restApi.reducers,
-    forms: combineForms({user: initialState.forms.user}, 'forms'),
+    forms: combineForms({
+        user: initialState.forms.user,
+        signup: initialState.forms.signup
+    }, 'forms'),
     auth: (auth) => _.chain(auth).cloneDeep().defaults(initialState.auth).value(),
     uiKey: (key) => key || 1
 });

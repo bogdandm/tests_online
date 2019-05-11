@@ -1,3 +1,5 @@
+from typing import Optional
+
 from rest_framework import serializers
 
 from .. import models
@@ -6,7 +8,7 @@ from .. import models
 class AnswerReadOnlySerializer(serializers.ModelSerializer):
     is_user_answer = serializers.SerializerMethodField()
 
-    def get_is_user_answer(self, answer: models.Answer):
+    def get_is_user_answer(self, answer: models.Answer) -> Optional[bool]:
         user_answers: models.UserAnswers = self.context.get("user_answers", None)
         return user_answers and user_answers.choices.filter(pk=answer.pk).exists()
 
@@ -39,7 +41,7 @@ class TestReadOnlyShortSerializer(serializers.ModelSerializer):
     questions_number = serializers.IntegerField()
     user_answers = serializers.SerializerMethodField()
 
-    def get_user_answers(self, test: models.Test):
+    def get_user_answers(self, test: models.Test) -> Optional[int]:
         return getattr(test, 'user_answers', None)
 
     class Meta:

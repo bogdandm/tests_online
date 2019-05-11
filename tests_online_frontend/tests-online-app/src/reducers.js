@@ -18,12 +18,22 @@ export const initialState = {
         username: null,
         email: null
     }),
+    api_user_signup: stateAsyncFactory({
+        id: null,
+        username: null,
+        email: null
+    }),
     api_tests: stateAsyncFactory([]),
     api_test: stateAsyncFactory(null),
 
     forms: {
         // TODO: Rename to LogIn
         user: {
+            username: '',
+            password: ''
+        },
+        signup: {
+            email: '',
             username: '',
             password: ''
         }

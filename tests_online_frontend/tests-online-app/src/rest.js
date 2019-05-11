@@ -70,7 +70,18 @@ export default reduxApi({
         },
         postfetch: [postAuth]
     },
-    api_user_info: `/api/v1/auth/user/`,
+    api_user_info: `/api/v1/auth/user/info/`,
+    api_user_signup: {
+        url: `/api/v1/auth/user/signup/`,
+        options: {
+            method: "post"
+        },
+        postfetch: [
+            ({data, actions, dispatch, getState, request}) => {
+                dispatch(actions.api_auth.obtain(request.params.data.username, request.params.data.password))
+            }
+        ]
+    },
     api_tests: {
         url: `api/v1/tests/`,
         helpers: {
