@@ -1,0 +1,14 @@
+:local(.buttonGroup) {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50px;
+}
+
+:local(.author) {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: .5em;
+    opacity: .8;
+}

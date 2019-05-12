@@ -17,14 +17,9 @@ class ConnectedTestsList extends Component {
 
     render() {
         return (
-
-            //<ui.Grid>
-            // <ui.Grid.Column mobile={16} tablet={8} computer={4}>
-            <ui.Card.Group className="link">
+            <ui.Card.Group className="link" style={{justifyContent: "space-between"}}>
                 {this.props.api_tests.data.map(test => <TestListItem {...test} key={test.id}/>)}
             </ui.Card.Group>
-            // </ui.Grid.Column>
-            //</ui.Grid>
         );
     }
 }
