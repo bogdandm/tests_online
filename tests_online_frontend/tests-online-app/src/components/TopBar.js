@@ -8,7 +8,7 @@ import Auth from "./Auth";
 
 const mapStateToProps = state => state;
 
-export class ConnectedTopBar extends Component {
+class ConnectedTopBar extends Component {
     render() {
         return (
             <ui.Segment inverted>

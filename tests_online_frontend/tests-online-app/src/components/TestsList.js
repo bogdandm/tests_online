@@ -3,28 +3,35 @@ import {connect} from "react-redux";
 import * as ui from "semantic-ui-react";
 
 import rest from "../rest";
-import {TestListItem} from "./TestListItem"
+import TestListItem from "./TestListItem"
 
 const mapStateToProps = state => {
     return {api_tests: state.api_tests};
 };
 
-export class ConnectedTestsList extends Component {
+class ConnectedTestsList extends Component {
     componentDidMount() {
         rest.actions.api_tests.abort();
-        this.props.dispatch(rest.actions.api_tests.list());
+        this.props.dispatch(rest.actions.api_tests.list(this.props.page));
     }
 
     render() {
         return (
-            <ui.List divided relaxed>
-                {this.props.api_tests.data.map(
-                    test => <TestListItem key={test.id} {...test} />)
-                }
-            </ui.List>
+
+            //<ui.Grid>
+            // <ui.Grid.Column mobile={16} tablet={8} computer={4}>
+            <ui.Card.Group className="link">
+                {this.props.api_tests.data.map(test => <TestListItem {...test} key={test.id}/>)}
+            </ui.Card.Group>
+            // </ui.Grid.Column>
+            //</ui.Grid>
         );
     }
 }
+
+ConnectedTestsList.defaultProps = {
+    page: 1
+};
 
 const TestsList = connect(mapStateToProps)(ConnectedTestsList);
 

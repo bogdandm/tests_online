@@ -9,7 +9,7 @@ const mapStateToProps = state => {
     return {...state.api_test};
 };
 
-export class ConnectedTestDetail extends Component {
+class ConnectedTestDetail extends Component {
     componentDidMount() {
         this.props.dispatch(rest.actions.api_test.retrieve(this.props.match.params.hash));
     }
