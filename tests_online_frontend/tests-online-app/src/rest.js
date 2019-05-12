@@ -1,6 +1,7 @@
 import axios from "axios";
 import _ from "lodash";
 import reduxApi from "redux-api";
+import {creators} from "./actions";
 
 function adapterAxios(url, options) {
     return axios.request({url, ...options});
@@ -22,13 +23,13 @@ const paginator = (data, prevData, action) => {
     return data.results
 };
 
-
-function postAuth({data, actions, dispatch, getState, request}) {
+function fetchUserInfo({actions, dispatch}) {
     dispatch(actions.api_user_info());
 }
 
 
 // TODO: Prefix
+// ({data, actions, dispatch, getState, request}) => {...}
 export default reduxApi({
     api_auth: {
         url: `/api/v1/auth/token/:action/`,
@@ -52,7 +53,13 @@ export default reduxApi({
                 ]
             }
         },
-        postfetch: [postAuth]
+        postfetch: [
+            fetchUserInfo,
+            ({request, dispatch}) => {
+                if (request.pathvars.action === "obtain")
+                    dispatch(creators.auth.login())
+            }
+        ]
     },
     // Duplicate endpoint to prevent race condition in store
     api_auth_refresh: {
@@ -68,20 +75,20 @@ export default reduxApi({
                 ]
             }
         },
-        postfetch: [postAuth]
+        postfetch: [fetchUserInfo]
     },
-    api_user_info: `/api/v1/auth/user/info/`,
     api_user_signup: {
         url: `/api/v1/auth/user/signup/`,
         options: {
             method: "post"
         },
         postfetch: [
-            ({data, actions, dispatch, getState, request}) => {
+            ({actions, dispatch, request}) => {
                 dispatch(actions.api_auth.obtain(request.params.data.username, request.params.data.password))
             }
         ]
     },
+    api_user_info: `/api/v1/auth/user/info/`,
     api_tests: {
         url: `api/v1/tests/`,
         helpers: {

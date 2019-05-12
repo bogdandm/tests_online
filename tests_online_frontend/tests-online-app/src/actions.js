@@ -4,6 +4,7 @@ export const actions = {
     forceUpdate: "FORCE_UPDATE", // Force redraw of main app view (everything except TopBar)
     auth: {
         load: "AUTH_LOAD",
+        login: "AUTH_LOGIN",
         logout: "AUTH_LOGOUT"
     }
 };
@@ -21,6 +22,7 @@ export const creators = {
             const accessToken = getState().auth.access;
             accessToken && dispatch(rest.actions.api_auth.verify(accessToken));
         },
+        login: generateCreator(actions.auth.login),
         logout: generateCreator(actions.auth.logout)
     }
 };

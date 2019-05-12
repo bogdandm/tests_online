@@ -1,8 +1,8 @@
 import _ from "lodash";
 
 import {actions} from "./actions";
+import history from './history'
 import rest, {stateAsyncFactory} from "./rest";
-
 
 export const initialState = {
     uiKey: 1,
@@ -70,7 +70,6 @@ export function authGlobal(state, action) {
                     return state;
             }
 
-
         case actions.auth.load:
             let authInit = localStorage.getItem("AUTH");
             if (authInit) {
@@ -84,9 +83,14 @@ export function authGlobal(state, action) {
             }
             return state;
 
+        case actions.auth.login:
+            setTimeout(() => history.push('/'), 16);
+            return state;
+
         case actions.auth.logout:
             state.auth = initialState.auth;
             localStorage.removeItem("AUTH");
+            setTimeout(() => history.push('/'), 16);
             return state;
 
         default:

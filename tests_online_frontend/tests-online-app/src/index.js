@@ -1,9 +1,10 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import {Provider} from "react-redux";
-import {BrowserRouter} from "react-router-dom";
+import {Router} from "react-router-dom";
 
 import App from "./components/App";
+import history from './history'
 import * as serviceWorker from "./serviceWorker";
 import store from "./store";
 import './style.css'
@@ -11,9 +12,9 @@ import './style.css'
 
 ReactDOM.render(
     <Provider store={store}>
-        <BrowserRouter>
+        <Router history={history}>
             <App/>
-        </BrowserRouter>
+        </Router>
     </Provider>,
     document.getElementById('root')
 );
