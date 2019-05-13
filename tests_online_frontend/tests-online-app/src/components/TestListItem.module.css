@@ -1,8 +1,39 @@
+:local(.card) {
+    color: inherit;
+    padding-right: calc(50px + 2 * .5em) !important;
+    transition: box-shadow 200ms, transform 200ms;
+}
+
+:local(.card:hover) {
+    color: inherit;
+}
+
 :local(.buttonGroup) {
     position: absolute;
     top: 0;
     right: 0;
-    width: 50px;
+    padding: .5em;
+    max-width: calc(50px + 2 * .5em);
+    opacity: 0;
+    transition: opacity 200ms;
+}
+
+:local(.card:hover .buttonGroup) {
+    opacity: 1;
+}
+
+:local(.buttonGroup button) {
+    margin-right: 0;
+    padding: .2em .3em !important;
+    background-color: transparent !important;
+}
+
+:local(.buttonGroup .iconBtn) {
+    margin-right: 0 !important;
+}
+
+:local(.smallLabel) {
+    padding: .2em .3em !important;
 }
 
 :local(.author) {
@@ -10,5 +41,5 @@
     bottom: 0;
     right: 0;
     padding: .5em;
-    opacity: .8;
+    opacity: .5;
 }

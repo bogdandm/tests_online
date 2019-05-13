@@ -23,6 +23,16 @@ class TestListItem extends Component {
         e.preventDefault()
     };
 
+    handleEditClick = e => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
+    handleStatClick = e => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
     render() {
         return <ui.Card
             raised={this.state.isHovered}
@@ -30,19 +40,58 @@ class TestListItem extends Component {
             onClick={this.handleClick}
             onMouseEnter={this.onMouseEnter}
             onMouseLeave={this.onMouseLeave}
-            style={{
-                color: "inherit",
-                paddingRight: 50
-            }}
+            className={styles.card}
         >
-            <ui.Card.Content
-                header={this.props.title}
-                description={
-                    ((s, cut) => s.length > cut ? s.slice(0, cut) + '...' : s)
-                    (this.props.description, this.props.descriptionCut)
-                }
-            />
-            <div className={styles.buttonGroup}>1234</div>
+            <ui.Card.Content>
+                <ui.Card.Header style={{
+                    display: "flex",
+                    alignItems: "center"
+                }}>
+                    {this.props.title}
+                    &nbsp;
+                    <ui.Popup className={styles.smallLabel} position='top right' size="mini" inverted
+                              content='Questions number'
+                              trigger={
+                                  this.props.user_answers ?
+                                      <ui.Label className={styles.smallLabel}
+                                                color={this.props.user_answers === this.props.questions_number
+                                                    ? "green" : "olive"
+                                                }>
+                                          {this.props.user_answers}/{this.props.questions_number}
+                                      </ui.Label>
+                                      :
+                                      <ui.Label className={styles.smallLabel}>
+                                          {this.props.questions_number}
+                                      </ui.Label>
+                              }
+                    />
+                </ui.Card.Header>
+                <ui.Card.Description>
+                    {((s, cut) => s.length > cut ? s.slice(0, cut) + '...' : s)(
+                        this.props.description, this.props.descriptionCut
+                    )}
+                </ui.Card.Description>
+            </ui.Card.Content>
+            <div className={styles.buttonGroup}>
+                <div style={{
+                    marginBottom: ".2em"
+                }}>
+                    <ui.Button animated='vertical' size="small" onClick={this.handleEditClick}>
+                        <ui.Button.Content hidden>Edit</ui.Button.Content>
+                        <ui.Button.Content visible className={styles.iconBtn}>
+                            <ui.Icon name="edit"/>
+                        </ui.Button.Content>
+                    </ui.Button>
+                </div>
+                <div>
+                    <ui.Button animated='vertical' size="small" onClick={this.handleStatClick}>
+                        <ui.Button.Content hidden>Stats</ui.Button.Content>
+                        <ui.Button.Content visible className={styles.iconBtn}>
+                            <ui.Icon name="area graph"/>
+                        </ui.Button.Content>
+                    </ui.Button>
+                </div>
+            </div>
             <div className={styles.author}>{this.props.owner}</div>
         </ui.Card>;
     }
