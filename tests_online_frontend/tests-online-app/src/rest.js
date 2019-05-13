@@ -1,10 +1,28 @@
-import axios from "axios";
+import axios, {CancelToken} from "axios";
 import _ from "lodash";
 import reduxApi from "redux-api";
 import {creators} from "./actions";
 
+export const requestsInProgress = [];
+
 function adapterAxios(url, options) {
-    return axios.request({url, ...options});
+    const request = {source: CancelToken.source(), active: true, url: url};
+    requestsInProgress.push(request);
+    return axios.request({url, cancelToken: request.source.token, ...options})
+        .then(
+            response => {
+                request.active = false;
+                return response
+            },
+            e => {
+                request.active = false;
+                if (axios.isCancel(e)) {
+                    console.warn('Request canceled', e.message || "");
+                } else {
+                    throw e
+                }
+            }
+        );
 }
 
 export function stateAsyncFactory(nested) {

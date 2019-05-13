@@ -8,7 +8,7 @@ import thunk from "redux-thunk";
 
 import {creators} from "./actions";
 import {authGlobal, globalReducer, initialState, setRestInitialState} from "./reducers";
-import rest from "./rest";
+import rest, {requestsInProgress} from "./rest";
 
 let store;
 let restApi = rest.use("responseHandler", function (error, response) {
@@ -16,6 +16,13 @@ let restApi = rest.use("responseHandler", function (error, response) {
 
     if (error) {
         if (error.response.status === 401 && error.response.data.code === "token_not_valid") {
+            requestsInProgress
+                .filter(request => request.active)
+                .forEach(request => {
+                    request.active = false;
+                    console.warn(`Cancel request ${request.url}`);
+                    request.source.cancel(request.url)
+                });
             async(
                 store.dispatch,
                 (cb) => {
