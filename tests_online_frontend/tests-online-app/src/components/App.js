@@ -24,6 +24,9 @@ class ConnectedApp extends Component {
                         <Route path="/tests/:page" render={props =>
                             <TestsList {...props} page={props.match.params.page}/>
                         }/>
+                        <Route path="/test/:hash/:questionIndex" render={props =>
+                            <TestDetail {...props} questionIndex={props.match.params.questionIndex - 1}/>
+                        }/>
                         <Route path="/test/:hash" component={TestDetail}/>
                     </Switch>
                 </ui.Container>

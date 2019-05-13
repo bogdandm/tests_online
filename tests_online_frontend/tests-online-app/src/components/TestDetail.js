@@ -1,6 +1,7 @@
 import _ from "lodash";
 import React, {Component} from "react";
 import {connect} from "react-redux";
+import {withRouter} from "react-router";
 import * as ui from "semantic-ui-react";
 
 import rest from "../rest";
@@ -21,14 +22,20 @@ class ConnectedTestDetail extends Component {
     componentDidMount() {
         this.props.dispatch(rest.actions.api_test.reset());
         this.props.dispatch(rest.actions.api_test.retrieve(this.props.match.params.hash));
+        if (!_.isEmpty(this.props.questionIndex))
+            this.setState({questionIndex: this.props.questionIndex});
     }
 
     prevQuestion = () => {
-        this.setState({questionIndex: Math.max(0, this.state.questionIndex - 1)});
+        let newIndex = Math.max(0, this.state.questionIndex - 1);
+        this.setState({questionIndex: newIndex});
+        this.props.history.push(`/test/${this.props.match.params.hash}/${newIndex + 1}`);
     };
 
     nextQuestion = () => {
-        this.setState({questionIndex: Math.min(this.state.questionIndex + 1, this.props.test.data.questions.length)});
+        let newIndex = Math.min(this.state.questionIndex + 1, this.props.test.data.questions.length);
+        this.setState({questionIndex: newIndex});
+        this.props.history.push(`/test/${this.props.match.params.hash}/${newIndex + 1}`);
     };
 
     render() {
@@ -94,7 +101,7 @@ class ConnectedTestDetail extends Component {
     }
 }
 
-export default connect(mapStateToProps)(ConnectedTestDetail);
+export default withRouter(connect(mapStateToProps)(ConnectedTestDetail));
 
 
 // ========================================================
@@ -115,27 +122,30 @@ class ConnectedQuestionComponent extends Component {
     }
 
     render() {
-        return _.isEmpty(this.props.data) ?
-            <ui.Placeholder>
-                <ui.Placeholder.Paragraph>
-                    <ui.Placeholder.Line/>
-                    <ui.Placeholder.Line/>
-                    <ui.Placeholder.Line/>
-                    <ui.Placeholder.Line/>
-                </ui.Placeholder.Paragraph>
-            </ui.Placeholder>
-            :
-            <div>
-                {this.props.data.text}
-                <ui.Divider/>
-                {this.props.data.answers.map((answer) =>
-                    <div>
-                        {answer.text}
-                    </div>
-                )}
-                <ui.Divider/>
-                <ui.Button>Reset</ui.Button>
-            </div>
+        return <ui.Transition.Group animation="fade" duration="500">
+            {_.isEmpty(this.props.data) ?
+                <ui.Placeholder>
+                    <ui.Placeholder.Paragraph>
+                        <ui.Placeholder.Line/>
+                        <ui.Placeholder.Line/>
+                        <ui.Placeholder.Line/>
+                        <ui.Placeholder.Line/>
+                    </ui.Placeholder.Paragraph>
+                </ui.Placeholder>
+                :
+                <div>
+                    {this.props.data.text}
+                    <ui.Divider/>
+                    {this.props.data.answers.map((answer) =>
+                        <div key={answer.id}>
+                            {answer.text}
+                        </div>
+                    )}
+                    <ui.Divider/>
+                    <ui.Button>Reset</ui.Button>
+                </div>
+            }
+        </ui.Transition.Group>
     }
 }
 

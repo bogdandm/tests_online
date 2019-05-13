@@ -16,10 +16,12 @@
     min-height: 250px;
     display: flex;
     justify-content: stretch;
-    align-items: center;
+    align-items: stretch;
 }
 
 :local(.buttonWrapper) {
+    display: flex;
+    align-items: center;
     padding: 1rem;
     cursor: pointer;
     transition: box-shadow 200ms;
