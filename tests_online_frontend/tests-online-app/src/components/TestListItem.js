@@ -1,10 +1,15 @@
 import React, {Component} from "react";
+import {connect} from "react-redux";
 import {withRouter} from "react-router-dom"
 import * as ui from "semantic-ui-react";
 
 import styles from "./TestListItem.module.css"
 
-class TestListItem extends Component {
+const mapStateToProps = state => {
+    return {user: state.api_user_info.data.username}
+};
+
+class ConnectedTestListItem extends Component {
     state = {
         isHovered: false,
     };
@@ -73,9 +78,8 @@ class TestListItem extends Component {
                 </ui.Card.Description>
             </ui.Card.Content>
             <div className={styles.buttonGroup}>
-                <div style={{
-                    marginBottom: ".2em"
-                }}>
+                {this.props.owner === this.props.user &&
+                <div style={{marginBottom: ".2em"}}>
                     <ui.Button animated='vertical' size="small" onClick={this.handleEditClick}>
                         <ui.Button.Content hidden>Edit</ui.Button.Content>
                         <ui.Button.Content visible className={styles.iconBtn}>
@@ -83,6 +87,7 @@ class TestListItem extends Component {
                         </ui.Button.Content>
                     </ui.Button>
                 </div>
+                }
                 <div>
                     <ui.Button animated='vertical' size="small" onClick={this.handleStatClick}>
                         <ui.Button.Content hidden>Stats</ui.Button.Content>
@@ -97,8 +102,8 @@ class TestListItem extends Component {
     }
 }
 
-TestListItem.defaultProps = {
+ConnectedTestListItem.defaultProps = {
     descriptionCut: 200
 };
 
-export default withRouter(TestListItem);
+export default withRouter(connect(mapStateToProps)(ConnectedTestListItem));

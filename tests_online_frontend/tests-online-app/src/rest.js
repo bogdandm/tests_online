@@ -134,6 +134,19 @@ export default reduxApi({
                 ]
             }
         }
+    },
+    api_question: {
+        url: `api/v1/tests/:test_id/questions/:id`,
+        helpers: {
+            retrieve(test_id, id) {
+                return [
+                    {test_id, id},
+                    {
+                        method: "GET"
+                    }
+                ]
+            }
+        }
     }
 }, {prefix: "api."})
     .use("fetch", adapterAxios)
