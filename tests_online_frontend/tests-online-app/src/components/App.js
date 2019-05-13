@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import {connect} from "react-redux";
 import {Route, Switch} from "react-router";
 import 'semantic-ui-css/semantic.min.css';
+// import 'semantic-forest/semantic.github.min.css';
 import * as ui from "semantic-ui-react";
 
 import TestDetail from "./TestDetail";

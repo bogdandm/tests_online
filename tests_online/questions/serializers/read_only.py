@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 from rest_framework import serializers
 
@@ -27,7 +27,10 @@ class QuestionReadOnlySerializer(serializers.ModelSerializer):
 
 class TestReadOnlySerializer(serializers.ModelSerializer):
     stats_restriction_display = serializers.CharField(source='get_stats_restriction_display')
-    questions = QuestionReadOnlySerializer(many=True, read_only=True)
+    questions = serializers.SerializerMethodField()
+
+    def get_questions(self, test: models.Test) -> List[id]:
+        return test.questions.order_by('position', 'pk').values_list('pk', flat=True)
 
     class Meta:
         model = models.Test

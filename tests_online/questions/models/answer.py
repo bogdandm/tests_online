@@ -16,7 +16,7 @@ class Answer(models.Model):
     class Meta:
         verbose_name = _("Answer")
         verbose_name_plural = _("Answers")
-        ordering = ("position",)
+        ordering = ("position", "pk")
 
     def __str__(self):
         return f"{self.question} -> {self.text}"
