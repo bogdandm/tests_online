@@ -176,7 +176,7 @@ class QuestionsModifyApi(APITestCaseEx):
 
         resp = self.client.get(reverse('tests-detail', kwargs={'hash': self.hash}))
         test_before = self.assertResp(resp)
-        question_id = choice(test_before["questions"])["id"]
+        question_id = choice(test_before["questions"])
 
         resp = self.client.put(reverse('questions-detail', kwargs={'test_hash': self.hash, 'pk': question_id}),
                                data=payload, **headers_admin)
@@ -196,7 +196,7 @@ class QuestionsModifyApi(APITestCaseEx):
 
         resp = self.client.get(reverse('tests-detail', kwargs={'hash': self.hash}))
         test_before = self.assertResp(resp)
-        question_id = choice(test_before["questions"])["id"]
+        question_id = choice(test_before["questions"])
 
         resp = self.client.delete(reverse('questions-detail', kwargs={'test_hash': self.hash, 'pk': question_id}),
                                   **headers_admin)

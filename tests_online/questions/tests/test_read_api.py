@@ -30,7 +30,6 @@ class TestReadApi(QuestionsTestData, APITestCaseEx):
             resp = self.client.get(reverse('tests-detail', kwargs={'hash': h}))
             test = self.assertResp(resp)
             self.assertTrue(test["questions"])
-            self.assertTrue(all(q["answers"] for q in test["questions"]))
 
     def test_results(self):
         user = self.user
