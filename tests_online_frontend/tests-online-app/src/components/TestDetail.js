@@ -22,7 +22,7 @@ class ConnectedTestDetail extends Component {
     componentDidMount() {
         this.props.dispatch(rest.actions.api_test.reset());
         this.props.dispatch(rest.actions.api_test.retrieve(this.props.match.params.hash));
-        if (!_.isEmpty(this.props.questionIndex))
+        if (this.props.questionIndex !== undefined)
             this.setState({questionIndex: this.props.questionIndex});
     }
 
@@ -111,6 +111,7 @@ const mapStateToPropsQuestion = state => {
     return {...state.api_question};
 };
 
+// TODO: Disable answers for anon user
 class ConnectedQuestionComponent extends Component {
     componentDidMount() {
         this.props.dispatch(rest.actions.api_question.reset());
@@ -121,30 +122,65 @@ class ConnectedQuestionComponent extends Component {
             ));
     }
 
+    setAnswer = (e, {value}) => {
+        this.syncAnswer(value)
+    };
+
+    resetAnswer = () => {
+        this.syncAnswer(null)
+    };
+
+    syncAnswer(answer_id) {
+        this.props.data.answers.forEach(answer => {
+            answer.is_user_answer = answer.id === answer_id
+        });
+        if (answer_id !== null) {
+            this.props.dispatch(rest.actions.api_give_answer.do(this.props.test_hash, this.props.qid, answer_id))
+        } else {
+            // TODO
+        }
+    }
+
     render() {
         return <ui.Transition.Group animation="fade" duration="500">
             {_.isEmpty(this.props.data) ?
-                <ui.Placeholder>
-                    <ui.Placeholder.Paragraph>
-                        <ui.Placeholder.Line/>
-                        <ui.Placeholder.Line/>
-                        <ui.Placeholder.Line/>
-                        <ui.Placeholder.Line/>
-                    </ui.Placeholder.Paragraph>
-                </ui.Placeholder>
+                <div>
+                    <ui.Placeholder>
+                        <ui.Placeholder.Paragraph>
+                            <ui.Placeholder.Line/>
+                            <ui.Placeholder.Line/>
+                            <ui.Placeholder.Line/>
+                            <ui.Placeholder.Line/>
+                        </ui.Placeholder.Paragraph>
+                    </ui.Placeholder>
+                    <ui.Divider/>
+                    <ui.Placeholder>
+                        {[0, 1, 2, 3].map((answer) =>
+                            <ui.Placeholder.Paragraph key={answer}>
+                                <ui.Placeholder.Line/>
+                            </ui.Placeholder.Paragraph>
+                        )}
+                    </ui.Placeholder>
+                </div>
                 :
                 <div>
                     {this.props.data.text}
                     <ui.Divider/>
                     {this.props.data.answers.map((answer) =>
                         <div key={answer.id}>
-                            {answer.text}
+                            <ui.Checkbox
+                                label={answer.text}
+                                name='answersGroup'
+                                value={answer.id}
+                                checked={answer.is_user_answer}
+                                onChange={this.setAnswer}
+                            />
                         </div>
                     )}
-                    <ui.Divider/>
-                    <ui.Button>Reset</ui.Button>
                 </div>
             }
+            <ui.Divider/>
+            <ui.Button onClick={this.resetAnswer}>Reset answer</ui.Button>
         </ui.Transition.Group>
     }
 }

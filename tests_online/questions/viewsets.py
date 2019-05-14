@@ -10,7 +10,28 @@ from core.views import CachedObjectMixin
 from . import models, serializers
 
 
-class TestsViewSet(viewsets.ModelViewSet, CachedObjectMixin):
+class UserAnswersMixin(viewsets.GenericViewSet):
+    def get_user_answers(self):
+        user_answers = getattr(self, '_get_user_answers_cache', None)
+        if user_answers is None:
+            test_hash = self.kwargs.get(self.lookup_url_kwarg
+                                        if self.lookup_url_kwarg and "hash" in self.lookup_url_kwarg
+                                        else "test_hash")
+            user = self.request.user
+            user_answers = models.UserAnswers.objects.filter(test__hash=test_hash, user=user).first()
+            setattr(self, '_get_user_answers_cache', user_answers)
+        return user_answers
+
+    def get_serializer_context_with_user_answer(self, context):
+        if self.request.user and not self.request.user.is_anonymous:
+            user_answers = self.get_user_answers()
+        else:
+            user_answers = None
+        context = {**context, "user_answers": user_answers}
+        return context
+
+
+class TestsViewSet(viewsets.ModelViewSet, CachedObjectMixin, UserAnswersMixin):
     lookup_url_kwarg = 'hash'
     lookup_field = 'hash'
 
@@ -63,22 +84,10 @@ class TestsViewSet(viewsets.ModelViewSet, CachedObjectMixin):
             "results": serializers.TestResultsSerializer
         }.get(self.action, Serializer)
 
-    def get_user_answers(self):
-        user_answers = getattr(self, '_get_user_answers_cache', None)
-        if user_answers is None:
-            test = self.get_object()
-            user = self.request.user
-            user_answers = models.UserAnswers.objects.filter(test=test, user=user).first()
-            setattr(self, '_get_user_answers_cache', user_answers)
-        return user_answers
-
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        if self.action == "retrieve" and self.request.user and not self.request.user.is_anonymous:
-            user_answers = self.get_user_answers()
-        else:
-            user_answers = None
-        context["user_answers"] = user_answers
+        if self.action == "retrieve":
+            context = self.get_serializer_context_with_user_answer(context)
         return context
 
     def perform_create(self, serializer):
@@ -112,7 +121,7 @@ class CreateTestPartPermission(BasePermissionEx):
         return owner_id == request.user.id
 
 
-class QuestionsViewSet(viewsets.ModelViewSet):
+class QuestionsViewSet(viewsets.ModelViewSet, UserAnswersMixin):
     queryset = models.Question.objects.all()
 
     modify_permission = And(permissions.IsAuthenticated, ObjectOwner('test.owner'))
@@ -138,6 +147,9 @@ class QuestionsViewSet(viewsets.ModelViewSet):
             "partial_update": serializers.QuestionSerializer
         }.get(self.action, Serializer)
 
+    def get_serializer_context(self):
+        return self.get_serializer_context_with_user_answer(super().get_serializer_context())
+
     def get_test_id(self):
         return models.Test.objects.filter(hash=self.kwargs["test_hash"]).values_list("id", flat=True)[0]
 
@@ -148,7 +160,7 @@ class QuestionsViewSet(viewsets.ModelViewSet):
         serializer.save(test_id=self.get_test_id())
 
 
-class AnswersViewSet(viewsets.ModelViewSet):
+class AnswersViewSet(viewsets.ModelViewSet, UserAnswersMixin):
     queryset = models.Answer.objects.all()
 
     modify_permission = And(permissions.IsAuthenticated, ObjectOwner('question.test.owner'))
@@ -176,6 +188,9 @@ class AnswersViewSet(viewsets.ModelViewSet):
             "partial_update": serializers.AnswerSerializer
         }.get(self.action, Serializer)
 
+    def get_serializer_context(self):
+        return self.get_serializer_context_with_user_answer(super().get_serializer_context())
+
     def perform_create(self, serializer):
         serializer.save(question_id=self.kwargs["question_pk"])
 
@@ -183,14 +198,14 @@ class AnswersViewSet(viewsets.ModelViewSet):
         serializer.save(question_id=self.kwargs["question_pk"])
 
     @action(detail=True, methods=['post'])
-    def give(self, request, **pks):
+    def give(self, request, test_hash, **pks):
         """
         Give answer with given pk as answer for question
         """
         answer = self.get_object()
         user = request.user
         question_id = answer.question_id
-        test_id = models.Test.objects.filter(questions__id=question_id).values_list("id", flat=True)[0]
+        test_id = models.Test.objects.filter(hash=test_hash).values_list("id", flat=True)[0]
 
         answers_set: models.UserAnswers = models.UserAnswers.objects.filter(user=user, test_id=test_id).first()
         updated = False

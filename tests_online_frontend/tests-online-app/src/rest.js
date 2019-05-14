@@ -123,7 +123,7 @@ export default reduxApi({
         transformer: paginator
     },
     api_test: {
-        url: `api/v1/tests/:id`,
+        url: `api/v1/tests/:id/`,
         helpers: {
             retrieve(id) {
                 return [
@@ -136,13 +136,27 @@ export default reduxApi({
         }
     },
     api_question: {
-        url: `api/v1/tests/:test_id/questions/:id`,
+        url: `api/v1/tests/:test_id/questions/:id/`,
         helpers: {
             retrieve(test_id, id) {
                 return [
                     {test_id, id},
                     {
                         method: "GET"
+                    }
+                ]
+            }
+        }
+    },
+    api_give_answer: {
+        url: `api/v1/tests/:test_id/questions/:question_id/answers/:answer_id/give/`,
+        helpers: {
+            do(test_id, question_id, answer_id) {
+                return [
+                    {test_id, question_id, answer_id},
+                    {
+                        method: "POST",
+                        data: {}
                     }
                 ]
             }
