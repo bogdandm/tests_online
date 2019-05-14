@@ -90,6 +90,7 @@ export function authGlobal(state, action) {
 
         case actions.auth.logout:
             state.auth = initialState.auth;
+            state.api_user_info.data = initialState.api_user_info.data;
             localStorage.removeItem("AUTH");
             setTimeout(() => history.push('/'), 16);
             return state;

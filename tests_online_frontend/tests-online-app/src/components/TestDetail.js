@@ -2,6 +2,7 @@ import _ from "lodash";
 import React, {Component} from "react";
 import {connect} from "react-redux";
 import {withRouter} from "react-router";
+import {async} from "redux-api";
 import * as ui from "semantic-ui-react";
 
 import rest from "../rest";
@@ -62,7 +63,10 @@ class ConnectedTestDetail extends Component {
                             </div>
                         }
                     </div>
-                    <ui.Divider horizontal>Questions</ui.Divider>
+                    <ui.Divider horizontal>
+                        Questions
+                        ({this.state.questionIndex + 1}/{_.get(this, 'props.test.data.questions.length', '?')})
+                    </ui.Divider>
                     <div className={styles.bottom}>
                         <div className={styles.buttonWrapperLeft}
                              disabled={this.state.questionIndex === 0}
@@ -108,11 +112,17 @@ export default withRouter(connect(mapStateToProps)(ConnectedTestDetail));
 
 
 const mapStateToPropsQuestion = state => {
-    return {...state.api_question};
+    return {
+        authorized: _.chain(state).get('api_user_info.data.id', null).isNumber().value(),
+        ...state.api_question
+    };
 };
 
-// TODO: Disable answers for anon user
 class ConnectedQuestionComponent extends Component {
+    state = {
+        synchronized: false
+    };
+
     componentDidMount() {
         this.props.dispatch(rest.actions.api_question.reset());
         if (this.props.qid !== undefined)
@@ -126,19 +136,15 @@ class ConnectedQuestionComponent extends Component {
         this.syncAnswer(value)
     };
 
-    resetAnswer = () => {
-        this.syncAnswer(null)
-    };
-
     syncAnswer(answer_id) {
         this.props.data.answers.forEach(answer => {
             answer.is_user_answer = answer.id === answer_id
         });
-        if (answer_id !== null) {
-            this.props.dispatch(rest.actions.api_give_answer.do(this.props.test_hash, this.props.qid, answer_id))
-        } else {
-            // TODO
-        }
+        this.setState({synchronized: true});
+        async(
+            this.props.dispatch,
+            cb => rest.actions.api_give_answer.do(this.props.test_hash, this.props.qid, answer_id, cb)
+        ).then(() => this.setState({synchronized: false}));
     }
 
     render() {
@@ -164,23 +170,39 @@ class ConnectedQuestionComponent extends Component {
                 </div>
                 :
                 <div>
-                    {this.props.data.text}
+                    <p style={{textAlign: "justify"}}>{this.props.data.text}</p>
                     <ui.Divider/>
-                    {this.props.data.answers.map((answer) =>
-                        <div key={answer.id}>
-                            <ui.Checkbox
-                                label={answer.text}
-                                name='answersGroup'
-                                value={answer.id}
-                                checked={answer.is_user_answer}
-                                onChange={this.setAnswer}
-                            />
-                        </div>
-                    )}
+                    {this.props.authorized ?
+                        this.props.data.answers.map((answer) =>
+                            <div key={answer.id} style={{marginBottom: "1em"}}>
+                                {this.state.synchronized && answer.is_user_answer ?
+                                    <div>
+                                        <ui.Loader size="tiny" active inline style={{marginRight: "1em"}}/>
+                                        <span>{answer.text}</span>
+                                    </div>
+                                    :
+                                    <ui.Checkbox
+                                        label={answer.text}
+                                        name='answersGroup'
+                                        value={answer.id}
+                                        checked={answer.is_user_answer}
+                                        disabled={answer.is_user_answer}
+                                        onChange={this.setAnswer}
+                                    />
+                                }
+                            </div>
+                        )
+                        :
+                        <ul>
+                            {this.props.data.answers.map((answer) =>
+                                <li key={answer.id} style={{textAlign: "justify"}}>
+                                    {answer.text}
+                                </li>
+                            )}
+                        </ul>
+                    }
                 </div>
             }
-            <ui.Divider/>
-            <ui.Button onClick={this.resetAnswer}>Reset answer</ui.Button>
         </ui.Transition.Group>
     }
 }
