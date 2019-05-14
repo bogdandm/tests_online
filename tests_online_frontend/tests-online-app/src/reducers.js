@@ -85,6 +85,7 @@ export function authGlobal(state, action) {
             return state;
 
         case actions.auth.login:
+            state.uiKey++;
             setTimeout(() => history.push('/'), 16);
             return state;
 
@@ -92,6 +93,7 @@ export function authGlobal(state, action) {
             state.auth = initialState.auth;
             state.api_user_info.data = initialState.api_user_info.data;
             localStorage.removeItem("AUTH");
+            state.uiKey++;
             setTimeout(() => history.push('/'), 16);
             return state;
 

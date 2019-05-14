@@ -58,12 +58,13 @@ class TestsViewSet(viewsets.ModelViewSet, CachedObjectMixin, UserAnswersMixin):
                 user = None
 
             queryset = queryset.annotate(
-                questions_number=Count('questions'),
+                questions_number=Count('questions', distinct=True),
                 owner_name=F('owner__username')
             )
             if user and not user.is_anonymous:
                 queryset = queryset.annotate(user_answers=Count(
                     'answers_set__choices',
+                    distinct=True,
                     filter=Q(answers_set__user_id=user.id)
                 ))
                 return queryset.filter(is_private=False) | queryset.filter(is_private=True, owner_id=user.id)
