@@ -15,20 +15,27 @@ let restApi = rest.use("responseHandler", function (error, response) {
     const state = store.getState();
 
     if (error) {
-        if (error.response.status === 401 && error.response.data.code === "token_not_valid") {
-            requestsInProgress
-                .filter(request => request.active)
-                .forEach(request => {
-                    request.active = false;
-                    console.warn(`Cancel request ${request.url}`);
-                    request.source.cancel(request.url)
-                });
-            async(
-                store.dispatch,
-                (cb) => {
-                    return rest.actions.api_auth_refresh.refresh(state.auth.refresh, cb)
-                }
-            ).then((data) => store.dispatch(creators.forceUpdate()));
+        if (
+            error.response.status === 401
+            && error.response.data.code === "token_not_valid"
+        ) {
+            if (error.config.url.endsWith('/refresh/')) {
+                store.dispatch(creators.auth.logout());
+            } else {
+                requestsInProgress
+                    .filter(request => request.active)
+                    .forEach(request => {
+                        request.active = false;
+                        console.warn(`Cancel request ${request.url}`);
+                        request.source.cancel(request.url)
+                    });
+                async(
+                    store.dispatch,
+                    (cb) => {
+                        return rest.actions.api_auth_refresh.refresh(state.auth.refresh, cb)
+                    }
+                ).then((data) => store.dispatch(creators.forceUpdate()));
+            }
             throw error;
         } else {
             console.warn("API Error: ", error);
