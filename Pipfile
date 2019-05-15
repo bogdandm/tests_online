@@ -23,6 +23,8 @@ djangorestframework-simplejwt = "*"
 drf-writable-nested = "*"
 drf-nested-routers = "*"
 django-cors-headers = "*"
+django-extensions = "*"
+ipython = "*"
 
 [requires]
 python_version = "3.7"

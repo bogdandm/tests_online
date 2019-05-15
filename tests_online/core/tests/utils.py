@@ -72,5 +72,12 @@ TEST_SETTINGS = dict(
 
         'core',
         'questions'
-    ]
+    ],
+    CACHES={
+        "default": {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'tests_online_cache',
+        }
+    }
+
 )

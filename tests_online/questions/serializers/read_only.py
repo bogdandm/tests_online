@@ -56,3 +56,4 @@ class TestReadOnlyShortSerializer(serializers.ModelSerializer):
 class TestResultsSerializer(serializers.Serializer):
     is_complete = serializers.BooleanField()
     results = serializers.JSONField()
+    bounds = serializers.JSONField()

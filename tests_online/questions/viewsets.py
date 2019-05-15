@@ -109,7 +109,9 @@ class TestsViewSet(viewsets.ModelViewSet, CachedObjectMixin, UserAnswersMixin):
 
         serializer = serializers.TestResultsSerializer(data={
             "is_complete": is_complete,
-            "results": dict(zip(test.params, results))
+            "results": dict(zip(test.params, results)),
+            "bound": {param: [min_value, max_value]
+                      for param, min_value, max_value in zip(test.params, *test.params_bounds)}
         })
         serializer.is_valid()
         return Response(serializer.data)

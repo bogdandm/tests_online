@@ -1,11 +1,14 @@
 import hashlib
 import uuid
+from typing import List, Tuple
 
 from django.conf import settings
 from django.contrib.postgres import fields as pg_fields
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
+from core.memcached import memcached_property
 
 
 def unique_hash() -> str:
@@ -57,6 +60,23 @@ class Test(models.Model):
                                          choices=STATS_RESTRICTIONS_CHOICES)
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, verbose_name=_("Owner"))
+
+    @memcached_property(
+        key=lambda test: str(test.id),
+        timeout=60 ** 2  # 1 hour
+    )
+    def params_bounds(self) -> Tuple[List[float], List[float]]:
+        params_min = [0.0 for param in self.params]
+        params_max = params_min[:]
+        for q in self.questions.only("id").iterator():
+            params_values = list(zip(*q.answers.values_list("params_value", flat=True)))
+            for i, param in enumerate(self.params):
+                params_min[i] += min(params_values[i])
+                params_max[i] += max(params_values[i])
+        return params_min, params_max
+
+    def clear_params_bounds(self):
+        return self.__class__.params_bounds.fget.clear_cache(self)
 
     class Meta:
         verbose_name = _("Test")
