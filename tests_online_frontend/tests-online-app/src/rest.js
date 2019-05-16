@@ -33,13 +33,7 @@ export function stateAsyncFactory(nested) {
         loading: false, // State updating is in progress
         error: null,    // response error
     }
-
 }
-
-const paginator = (data, prevData, action) => {
-    data || (data = {"results": []});
-    return data.results
-};
 
 function fetchUserInfo({actions, dispatch}) {
     dispatch(actions.api_user_info());
@@ -110,17 +104,16 @@ export default reduxApi({
     api_tests: {
         url: `api/v1/tests/`,
         helpers: {
-            list(page = 1) {
+            list(page = 1, pageSize = 10) {
                 return [
                     {},
                     {
                         method: "GET",
-                        params: {page}
+                        params: {page, size: pageSize}
                     }
                 ]
             }
-        },
-        transformer: paginator
+        }
     },
     api_test: {
         url: `api/v1/tests/:id/`,
