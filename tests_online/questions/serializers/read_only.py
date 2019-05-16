@@ -28,14 +28,18 @@ class QuestionReadOnlySerializer(serializers.ModelSerializer):
 class TestReadOnlySerializer(serializers.ModelSerializer):
     stats_restriction_display = serializers.CharField(source='get_stats_restriction_display')
     questions = serializers.SerializerMethodField()
+    user_answers = serializers.SerializerMethodField()
 
     def get_questions(self, test: models.Test) -> List[id]:
         return test.questions.order_by('position', 'pk').values_list('pk', flat=True)
 
+    def get_user_answers(self, test: models.Test) -> Optional[int]:
+        return getattr(test, 'user_answers', None)
+
     class Meta:
         model = models.Test
         fields = ('id', 'hash', 'title', 'description', 'is_private', 'params', 'params_defaults',
-                  'stats_restriction', 'stats_restriction_display', 'owner', 'questions')
+                  'stats_restriction', 'stats_restriction_display', 'owner', 'questions', 'user_answers')
 
 
 class TestReadOnlyShortSerializer(serializers.ModelSerializer):

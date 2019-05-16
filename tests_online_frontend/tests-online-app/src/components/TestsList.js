@@ -5,8 +5,8 @@ import {withRouter} from "react-router";
 import * as ui from "semantic-ui-react";
 
 import rest from "../rest";
-import styles from "./TestList.module.css"
 import TestListItem from "./TestListItem"
+import styles from "./TestsList.module.css"
 
 const mapStateToProps = state => {
     return {api_tests: state.api_tests};

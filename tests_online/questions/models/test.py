@@ -51,9 +51,9 @@ class Test(models.Model):
     description = models.TextField(_("Description"))
     is_private = models.BooleanField(_("Is private?"), default=False)
 
-    params = pg_fields.ArrayField(models.CharField(max_length=256), default=_params__default,
+    params = pg_fields.ArrayField(models.CharField(max_length=256), default=_params__default, blank=True,
                                   verbose_name=_("Parameters"))
-    params_defaults = pg_fields.ArrayField(models.FloatField(), default=_params_defaults__default,
+    params_defaults = pg_fields.ArrayField(models.FloatField(), default=_params_defaults__default, blank=True,
                                            verbose_name=_("Parameters default values"))
 
     stats_restriction = models.CharField(_("Statistic restriction"), max_length=16, default=TestStatsChoices.OFF,

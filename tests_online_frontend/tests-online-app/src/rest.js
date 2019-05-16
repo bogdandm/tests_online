@@ -128,6 +128,19 @@ export default reduxApi({
             }
         }
     },
+    api_test_results: {
+        url: `api/v1/tests/:id/results/`,
+        helpers: {
+            retrieve(id) {
+                return [
+                    {id},
+                    {
+                        method: "GET"
+                    }
+                ]
+            }
+        }
+    },
     api_question: {
         url: `api/v1/tests/:test_id/questions/:id/`,
         helpers: {

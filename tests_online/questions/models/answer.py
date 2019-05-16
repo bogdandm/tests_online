@@ -8,7 +8,7 @@ from .test import Test
 class Answer(models.Model):
     position = models.SmallIntegerField(_("Position"), default=-1)
     text = models.TextField(_("Text"))
-    params_value = pg_fields.ArrayField(models.FloatField(), verbose_name=_("Parameters"))
+    params_value = pg_fields.ArrayField(models.FloatField(), blank=True, verbose_name=_("Parameters"))
 
     question = models.ForeignKey('questions.Question', related_name="answers", on_delete=models.CASCADE,
                                  verbose_name=_("Question"))
@@ -22,5 +22,10 @@ class Answer(models.Model):
         return f"{self.question} -> {self.text}"
 
     def clean(self):
-        if len(self.params_value) != len(self.question.test.params_defaults):
+        if (
+                self.params_value and self.question.test.params_defaults
+                and len(self.params_value) != len(self.question.test.params_defaults)
+                or not self.params_value and self.question.test.params_defaults
+                or self.params_value and not self.question.test.params_defaults
+        ):
             raise Test.TestParamsError('params_value', 'test.params')

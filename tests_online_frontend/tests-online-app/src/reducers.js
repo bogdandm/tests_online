@@ -25,6 +25,7 @@ export const initialState = {
     }),
     api_tests: stateAsyncFactory([]),
     api_test: stateAsyncFactory(null),
+    api_test_results: stateAsyncFactory(null),
     api_question: stateAsyncFactory(null),
 
     forms: {

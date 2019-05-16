@@ -47,31 +47,33 @@ class TestsViewSet(viewsets.ModelViewSet, CachedObjectMixin, UserAnswersMixin):
     })]
 
     def get_queryset(self):
+        if self.request.auth:
+            user = self.request.auth.user
+        elif self.request.user:
+            user = self.request.user
+        else:
+            user = None
+        if user and user.is_anonymous:
+            user = None
+
         queryset = models.Test.objects.all()
 
-        if self.action == "list":
-            if self.request.auth:
-                user = self.request.auth.user
-            elif self.request.user:
-                user = self.request.user
-            else:
-                user = None
+        if self.action in ("list", "retrieve") and user:
+            queryset = queryset.annotate(user_answers=Count(
+                'answers_set__choices',
+                distinct=True,
+                filter=Q(answers_set__user_id=user.id)
+            ))
 
+        if self.action == "list":
             queryset = queryset.annotate(
                 questions_number=Count('questions', distinct=True),
                 owner_name=F('owner__username')
             )
-            if user and not user.is_anonymous:
-                queryset = queryset.annotate(user_answers=Count(
-                    'answers_set__choices',
-                    distinct=True,
-                    filter=Q(answers_set__user_id=user.id)
-                ))
+            if user:
                 return queryset.filter(is_private=False) | queryset.filter(is_private=True, owner_id=user.id)
             else:
                 return queryset.filter(is_private=False)
-        elif self.action == "retrieve":
-            return queryset.prefetch_related("questions__answers")
         else:
             return queryset
 
@@ -110,8 +112,8 @@ class TestsViewSet(viewsets.ModelViewSet, CachedObjectMixin, UserAnswersMixin):
         serializer = serializers.TestResultsSerializer(data={
             "is_complete": is_complete,
             "results": dict(zip(test.params, results)),
-            "bound": {param: [min_value, max_value]
-                      for param, min_value, max_value in zip(test.params, *test.params_bounds)}
+            "bounds": {param: [min_value, max_value]
+                       for param, min_value, max_value in zip(test.params, *test.params_bounds)}
         })
         serializer.is_valid()
         return Response(serializer.data)

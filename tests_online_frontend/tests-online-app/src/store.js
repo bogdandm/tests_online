@@ -39,7 +39,8 @@ let restApi = rest.use("responseHandler", function (error, response) {
             throw error;
         } else {
             console.warn("API Error: ", error);
-            cogoToast.error(`${error.toString()}: ${error.config.method.toUpperCase()} ${error.config.url}`);
+            if (process.env.NODE_ENV === "development")
+                cogoToast.error(`${error.toString()}: ${error.config.method.toUpperCase()} ${error.config.url}`);
             throw error;
         }
     } else {
@@ -69,7 +70,8 @@ function reducer(state, action) {
     });
 }
 
-store = createStore(reducer, initialState, applyMiddleware(thunk, logger));
+const middleware = process.env.NODE_ENV === "development" ? [thunk, logger] : [thunk];
+store = createStore(reducer, initialState, applyMiddleware(...middleware));
 console.log("Store initial state: ", store.getState());
 
 export default store;

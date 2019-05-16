@@ -19,15 +19,15 @@ class ConnectedApp extends Component {
                 <TopBar/>
                 <ui.Container key={"container" + this.props.uiKey} style={{marginTop: '7em'}}>
                     <Switch>
-                        <Route exact path="/" component={TestsList}/>
-                        <Route exact path="/tests" component={TestsList}/>
+                        <Route exact path="/" render={props => <TestsList {...props}/>}/>
+                        <Route exact path="/tests" render={props => <TestsList {...props}/>}/>
                         <Route path="/tests/:page" render={props =>
                             <TestsList {...props} page={props.match.params.page}/>
                         }/>
                         <Route path="/test/:hash/:questionIndex" render={props =>
                             <TestDetail {...props} questionIndex={props.match.params.questionIndex - 1}/>
                         }/>
-                        <Route path="/test/:hash" component={TestDetail}/>
+                        <Route path="/test/:hash" render={props => <TestDetail {...props}/>}/>
                     </Switch>
                 </ui.Container>
             </div>
