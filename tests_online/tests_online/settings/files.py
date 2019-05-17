@@ -20,7 +20,7 @@ TEMPLATES = [
     },
 ]
 
-STATIC_URL = '/static/'
+STATIC_URL = os.environ.get('STATIC_URL', '/static/')
 STATIC_ROOT = os.environ.get('STATIC_ROOT', str((BASE_PATH / '..' / 'static').resolve()))
 STATICFILES_DIRS = (str(BASE_PATH / "static"),)
 

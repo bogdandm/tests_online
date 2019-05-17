@@ -1,11 +1,10 @@
-# TODO: Add health check to django
-
 version: '3.7'
 
 volumes:
   redis-data:
   pg-data:
   static-data:
+  frontend-data:
   media-data:
 
 services:
@@ -16,7 +15,8 @@ services:
       dockerfile: nginx/Dockerfile
     restart: unless-stopped
     volumes:
-      - static-data:/srv/tests-online/static
+      - static-data:/srv/tests-online/django-static
+      - frontend-data:/srv/tests-online/frontend-static
       - media-data:/srv/tests-online/media
     working_dir: /opt
     ports:
@@ -40,7 +40,6 @@ services:
       dockerfile: ./tests_online_docker/django/Dockerfile
     restart: unless-stopped
     volumes:
-      - static-data:/opt/tests_online/static
       - media-data:/opt/tests_online/media
       - ../logs:/opt/tests_online/logs
     working_dir: /opt/tests_online
@@ -65,9 +64,9 @@ services:
 
   django-migrate:
     image: tests-online-django:latest
-    restart: on-failure
+    restart: "no"
     volumes:
-      - static-data:/opt/tests_online/static
+      - static-data:/opt/tests_online/django-static
       - media-data:/opt/tests_online/media
     working_dir: /opt/tests_online
     env_file:
@@ -80,6 +79,18 @@ services:
       - redis
     command: ./wait-for-it.sh redis:6379 -- ./wait-for-it.sh db:5432 -- /opt/tests_online/tests_online_docker/django/migrate.sh
     container_name: tests-online-django-migrate
+
+  frontend:
+    image: tests-online-frontend:latest
+    build:
+      context: ../
+      dockerfile: ./tests_online_docker/frontend/Dockerfile
+    restart: "no"
+    volumes:
+      - frontend-data:/mnt/static
+    working_dir: /opt/tests_online
+    command: /opt/tests_online/move_compiled_files.sh
+    container_name: tests-online-frontend
 
   db:
     image: postgres:11-alpine

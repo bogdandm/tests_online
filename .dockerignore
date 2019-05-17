@@ -1,49 +1,28 @@
-venv/
-lvenv/
-__pycache__/
-
-*.sqlite3
-*.sql
-
-.idea/
+venv
+lvenv
+__pycache__
+.idea
 .env
 
 *.log
 *.key
 *.tmp
-*.lock
-!yarn.lock
-!Pipfile.lock
 *.pid
 .coverage
-htmlcov/
+htmlcov
 coverage.svg
-
-pgdata/
-mysql_data/
-redis/
-/static/
-media/
-
+pgdata
+mysql_data
+redis
+media
 celerybeat-schedule
-.test/
-
-# Frontend
-# dependencies
 node_modules
-/.pnp
-.pnp.js
-
-# production
-/tests_online_frontend/build
-
-# misc
+build
 .DS_Store
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
