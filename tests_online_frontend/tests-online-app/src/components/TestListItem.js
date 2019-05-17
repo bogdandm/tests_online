@@ -77,7 +77,7 @@ class ConnectedTestListItem extends Component {
                     )}
                 </ui.Card.Description>
             </ui.Card.Content>
-            <div className={styles.buttonGroup}>
+            <div className={styles.buttonGroup + " not-implemented"}>
                 {this.props.owner === this.props.user &&
                 <div style={{marginBottom: ".2em"}}>
                     <ui.Button animated='vertical' size="small" onClick={this.handleEditClick}>

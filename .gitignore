@@ -35,7 +35,7 @@ node_modules/
 .pnp.js
 
 # production
-/tests_online_frontend/build
+/tests_online_frontend/tests-online-app/build
 
 # misc
 .DS_Store

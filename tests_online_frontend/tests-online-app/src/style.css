@@ -5,3 +5,7 @@ body {
 .ui.cards::after {
     content: none !important;
 }
+
+.not-implemented {
+    display: none !important;
+}
