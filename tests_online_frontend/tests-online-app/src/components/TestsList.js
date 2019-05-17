@@ -40,8 +40,44 @@ class ConnectedTestsList extends Component {
         return (
             <div className={styles.wrapper}>
                 <ui.Card.Group className="link" style={{justifyContent: "space-between"}}>
-                    {_.get(this.props.api_tests.data, 'results', [])
-                        .map(test => <TestListItem {...test} key={test.id}/>)}
+                    {_.isEmpty(this.props.api_tests.data) ?
+                        [
+                            _.range(5).map(() =>
+                                <ui.Card>
+                                    <ui.Card.Content>
+                                        <ui.Card.Header style={{marginBottom: "1em"}}>
+                                            <ui.Placeholder>
+                                                <ui.Placeholder.Header>
+                                                    <ui.Placeholder.Line/>
+                                                </ui.Placeholder.Header>
+                                            </ui.Placeholder>
+                                        </ui.Card.Header>
+                                        <ui.Card.Description>
+                                            <ui.Placeholder>
+                                                <ui.Placeholder.Paragraph>
+                                                    <ui.Placeholder.Line/>
+                                                    <ui.Placeholder.Line/>
+                                                    <ui.Placeholder.Line/>
+                                                    <ui.Placeholder.Line/>
+                                                    <ui.Placeholder.Line/>
+                                                    <ui.Placeholder.Line/>
+                                                </ui.Placeholder.Paragraph>
+                                            </ui.Placeholder>
+                                        </ui.Card.Description>
+                                    </ui.Card.Content>
+                                </ui.Card>
+                            ),
+                            <div className="ui card" style={{opacity: 0}}/>
+                        ]
+                        :
+                        [
+                            _.get(this.props.api_tests.data, 'results', []).map(test =>
+                                <TestListItem {...test} key={test.id}/>
+                            ),
+                            this.props.api_tests.data.results.length % 2 ?
+                                <div className="ui card" style={{opacity: 0}}/> : ""
+                        ]
+                    }
                 </ui.Card.Group>
                 <ui.Pagination
                     defaultActivePage={this.state.page}

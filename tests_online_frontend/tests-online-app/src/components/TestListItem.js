@@ -50,7 +50,7 @@ class ConnectedTestListItem extends Component {
             <ui.Card.Content>
                 <ui.Card.Header style={{
                     display: "flex",
-                    alignItems: "center"
+                    alignItems: "flex-start"
                 }}>
                     {this.props.title}
                     &nbsp;
