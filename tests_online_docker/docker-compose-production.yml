@@ -10,9 +10,6 @@ volumes:
 services:
   nginx:
     image: bogdandm/tests-online-nginx:latest
-    build:
-      context: .
-      dockerfile: nginx/Dockerfile
     restart: unless-stopped
     volumes:
       - static-data:/srv/tests-online/django-static
@@ -35,9 +32,6 @@ services:
 
   django:
     image: bogdandm/tests-online-django:latest
-    build:
-      context: ../
-      dockerfile: ./tests_online_docker/django/Dockerfile
     restart: unless-stopped
     volumes:
       - media-data:/opt/tests_online/media
@@ -82,9 +76,6 @@ services:
 
   frontend:
     image: bogdandm/tests-online-frontend:latest
-    build:
-      context: ../
-      dockerfile: ./tests_online_docker/frontend/Dockerfile
     restart: "no"
     volumes:
       - frontend-data:/mnt/static

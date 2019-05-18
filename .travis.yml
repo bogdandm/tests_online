@@ -1,3 +1,4 @@
+language: generic
 services:
   - docker
 
@@ -12,14 +13,16 @@ before_install:
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
+  - docker-compose --version
 
 install:
+  - docker-compose -f docker-compose-production.yml pull || echo "Can't pull images - skip"
   - cp default.env .env
   - cd tests_online_docker
   - docker-compose build
 
 script:
-  - docker-compose up -d
+  - docker-compose -f docker-compose-production.yml up -d
   - sleep 10
   - docker exec tests-online-django bash -c "cd tests_online && ./manage.py test --no-input --parallel"
 
