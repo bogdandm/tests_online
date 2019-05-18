@@ -28,7 +28,7 @@ install:
   - docker-compose -f docker-compose.yml -f docker-compose-production-build.yml build
 
 script:
-  - docker-compose -f docker-compose.yml -f docker-compose-production.yml up -d
+  - docker-compose -f docker-compose.yml -f docker-compose-production-build.yml up -d
   - sleep 10
   - docker exec tests-online-django bash -c "cd tests_online && ./manage.py test --no-input --parallel"
   - cd ..
