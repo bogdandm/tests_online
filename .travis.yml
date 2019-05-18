@@ -31,6 +31,7 @@ script:
   - docker-compose -f docker-compose-production.yml up -d
   - sleep 10
   - docker exec tests-online-django bash -c "cd tests_online && ./manage.py test --no-input --parallel"
+  - cd ..
 
 before_deploy:
   # Set up ssh key
@@ -42,13 +43,13 @@ before_deploy:
 deploy:
   # Docker push and deploy over SSH
   - provider: script
-    script: bash ../deploy.sh $TRAVIS_TAG
+    script: bash deploy.sh $TRAVIS_TAG
     on:
       tags: true
       all_branches: false
 
   # Docker push unstable image
   - provider: script
-    script: bash ../docker_push.sh unstable
+    script: bash docker_push.sh unstable
     on:
       branch: master

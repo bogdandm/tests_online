@@ -80,6 +80,8 @@ services:
     volumes:
       - frontend-data:/mnt/static
     working_dir: /opt/tests_online
+    env_file:
+      - ../.env
     command: /opt/tests_online/move_compiled_files.sh
     container_name: tests-online-frontend
 
