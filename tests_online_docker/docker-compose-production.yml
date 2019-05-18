@@ -1,20 +1,116 @@
 version: '3.7'
 
+volumes:
+  redis-data:
+  pg-data:
+  static-data:
+  frontend-data:
+  media-data:
+
 services:
   nginx:
     image: bogdandm/tests-online-nginx:latest
-    build:
+    restart: unless-stopped
+    volumes:
+      - static-data:/srv/tests-online/django-static
+      - frontend-data:/srv/tests-online/frontend-static
+      - media-data:/srv/tests-online/media
+    working_dir: /opt
     ports:
       - "0.0.0.0:80:80"
+    links:
+      - django
+    depends_on:
+      - django
+    command: ./wait-for-it.sh django:2021 -- nginx -g "daemon off;"
+    container_name: tests-online-nginx
+    healthcheck:
+      test: ["CMD-SHELL", "curl -I --fail localhost:80"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
   django:
     image: bogdandm/tests-online-django:latest
-    build:
+    restart: unless-stopped
+    volumes:
+      - media-data:/opt/tests_online/media
+      - ../logs:/opt/tests_online/logs
+    working_dir: /opt/tests_online
+    env_file:
+      - ../.env
+    links:
+      - db
+      - redis
+    depends_on:
+      - db
+      - redis
+    expose:
+      - 2021
+    #    command: tail -f /dev/null
+    command: ./wait-for-it.sh db:5432 redis:6379 -- /opt/tests_online/tests_online_docker/django/run_django.sh
+    container_name: tests-online-django
+    healthcheck:
+      test: ["CMD-SHELL", "./wait-for-it.sh localhost:2021"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
   django-migrate:
     image: bogdandm/tests-online-django:latest
-    build:
+    restart: "no"
+    volumes:
+      - static-data:/opt/tests_online/django-static
+      - media-data:/opt/tests_online/media
+    working_dir: /opt/tests_online
+    env_file:
+      - ../.env
+    links:
+      - db
+      - redis
+    depends_on:
+      - db
+      - redis
+    command: ./wait-for-it.sh redis:6379 -- ./wait-for-it.sh db:5432 -- /opt/tests_online/tests_online_docker/django/migrate.sh
+    container_name: tests-online-django-migrate
 
   frontend:
     image: bogdandm/tests-online-frontend:latest
-    build:
+    restart: "no"
+    volumes:
+      - frontend-data:/mnt/static
+    working_dir: /opt/tests_online
+    env_file:
+      - ../.env
+    command: /opt/tests_online/move_compiled_files.sh
+    container_name: tests-online-frontend
+
+  db:
+    image: postgres:11-alpine
+    restart: unless-stopped
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    env_file:
+      - ../.env
+    expose:
+      - 5432
+    container_name: tests-online-db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tests_online"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:5-alpine
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    expose:
+      - 6379
+    container_name: tests-online-redis
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
