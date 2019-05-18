@@ -32,12 +32,12 @@ script:
 
 deploy:
   - provider: script
-    script: bash docker_push.sh $TRAVIS_TAG
+    script: bash ../docker_push.sh $TRAVIS_TAG
     on:
       tags: true
       all_branches: false
 
   - provider: script
-    script: bash docker_push.sh unstable
+    script: bash ../docker_push.sh unstable
     on:
       branch: master
