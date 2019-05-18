@@ -170,7 +170,7 @@ export default reduxApi({
     }
 }, {prefix: "api."})
     .use("fetch", adapterAxios)
-    .use("rootUrl", _.get(process.env, 'REACT_APP_DOMAIN', "http://localhost:8000"))
+    .use("rootUrl", process.env.REACT_APP_DOMAIN || "http://localhost:8000")
     .use("options", (url, params, getState) => {
         const state = getState();
         return {

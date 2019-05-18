@@ -9,13 +9,10 @@ volumes:
 
 services:
   nginx:
-    image: bogdandm/tests-online-nginx:latest
+    image: tests-online-nginx:latest
     build:
       context: .
       dockerfile: nginx/Dockerfile
-      cache_from:
-        - bogdandm/tests-online-nginx:unstable
-        - bogdandm/tests-online-nginx:latest
     restart: unless-stopped
     volumes:
       - static-data:/srv/tests-online/django-static
@@ -37,13 +34,10 @@ services:
       retries: 5
 
   django:
-    image: bogdandm/tests-online-django:latest
+    image: tests-online-django:latest
     build:
       context: ../
       dockerfile: ./tests_online_docker/django/Dockerfile
-      cache_from:
-        - bogdandm/tests-online-django:unstable
-        - bogdandm/tests-online-django:latest
     restart: unless-stopped
     volumes:
       - media-data:/opt/tests_online/media
@@ -69,7 +63,7 @@ services:
       retries: 5
 
   django-migrate:
-    image: bogdandm/tests-online-django:latest
+    image: tests-online-django:latest
     restart: "no"
     volumes:
       - static-data:/opt/tests_online/django-static
@@ -87,13 +81,10 @@ services:
     container_name: tests-online-django-migrate
 
   frontend:
-    image: bogdandm/tests-online-frontend:latest
+    image: tests-online-frontend:latest
     build:
       context: ../
       dockerfile: ./tests_online_docker/frontend/Dockerfile
-      cache_from:
-        - bogdandm/tests-online-frontend:unstable
-        - bogdandm/tests-online-frontend:latest
     restart: "no"
     volumes:
       - frontend-data:/mnt/static
