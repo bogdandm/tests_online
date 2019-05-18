@@ -17,7 +17,7 @@ services:
       - media-data:/srv/tests-online/media
     working_dir: /opt
     ports:
-      - "0.0.0.0:8000:80"
+      - "0.0.0.0:80:80"
     links:
       - django
     depends_on:

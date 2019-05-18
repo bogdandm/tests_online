@@ -16,9 +16,9 @@ before_install:
   - docker-compose --version
 
   # Load cache
-  - docker pull bogdandm/tests-online-frontend:unstable || echo "Can't pull image - skip"
-  - docker pull bogdandm/tests-online-django:unstable || echo "Can't pull image - skip"
-  - docker pull bogdandm/tests-online-nginx:unstable || echo "Can't pull image - skip"
+  - docker pull bogdandm/tests-online-frontend:unstable && docker tag bogdandm/tests-online-frontend:unstable bogdandm/tests-online-frontend:latest || echo "Can't pull image - skip"
+  - docker pull bogdandm/tests-online-django:unstable && docker tag bogdandm/tests-online-django:unstable bogdandm/tests-online-django:latest || echo "Can't pull image - skip"
+  - docker pull bogdandm/tests-online-nginx:unstable && docker tag bogdandm/tests-online-nginx:unstable bogdandm/tests-online-nginx:latest || echo "Can't pull image - skip"
 
 install:
   - cp default.env .env
