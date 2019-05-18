@@ -15,8 +15,12 @@ before_install:
   - sudo mv docker-compose /usr/local/bin
   - docker-compose --version
 
+  # Load cache
+  - docker pull bogdandm/tests-online-frontend:unstable || echo "Can't pull image - skip"
+  - docker pull bogdandm/tests-online-django:unstable || echo "Can't pull image - skip"
+  - docker pull bogdandm/tests-online-nginx:unstable || echo "Can't pull image - skip"
+
 install:
-  - docker-compose -f docker-compose-production.yml pull || echo "Can't pull images - skip"
   - cp default.env .env
   - cd tests_online_docker
   - docker-compose build
@@ -32,3 +36,8 @@ deploy:
     on:
       tags: true
       all_branches: false
+
+  - provider: script
+    script: bash docker_push.sh unstable
+    on:
+      branch: master
