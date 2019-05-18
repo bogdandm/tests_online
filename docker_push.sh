@@ -8,12 +8,11 @@ declare -a images=("tests-online-frontend" "tests-online-django" "tests-online-n
 # everything else as :latest, :unstable and :$TRAVIS_TAG
 for image in "${images[@]}"
 do
-   docker tag $image bogdandm/$image:$TRAVIS_TAG
+   docker tag bogdandm/$image bogdandm/$image:$TRAVIS_TAG
    docker push bogdandm/$image:$TRAVIS_TAG
    if [ $TRAVIS_TAG != "unstable" ]; then
-       docker tag $image bogdandm/$image:unstable
+       docker tag bogdandm/$image bogdandm/$image:unstable
        docker push bogdandm/$image:unstable
-       docker tag $image bogdandm/$image:latest
        docker push bogdandm/$image:latest
    fi
 done
