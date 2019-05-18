@@ -39,6 +39,7 @@ before_deploy:
   - eval "$(ssh-agent -s)"
   - chmod 600 /tmp/id_rsa
   - ssh-add /tmp/id_rsa
+  - chmod -v +x *.sh
 
 deploy:
   # Docker push and deploy over SSH
