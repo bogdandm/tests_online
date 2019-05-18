@@ -9,6 +9,7 @@ env:
     - DOCKER_COMPOSE_VERSION=1.24.0
 
 before_install:
+  # Update docker-compose
   - sudo rm /usr/local/bin/docker-compose
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
@@ -31,13 +32,22 @@ script:
   - sleep 10
   - docker exec tests-online-django bash -c "cd tests_online && ./manage.py test --no-input --parallel"
 
+before_deploy:
+  # Set up ssh key
+  - openssl aes-256-cbc -K $encrypted_cd5bfcb25efa_key -iv $encrypted_cd5bfcb25efa_iv -in id_rsa.enc -out /tmp/id_rsa -d
+  - eval "$(ssh-agent -s)"
+  - chmod 600 /tmp/id_rsa
+  - ssh-add /tmp/id_rsa
+
 deploy:
+  # Docker push and deploy over SSH
   - provider: script
-    script: bash ../docker_push.sh $TRAVIS_TAG
+    script: bash ../deploy.sh $TRAVIS_TAG
     on:
       tags: true
       all_branches: false
 
+  # Docker push unstable image
   - provider: script
     script: bash ../docker_push.sh unstable
     on:
