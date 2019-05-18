@@ -4,7 +4,7 @@
 
 ssh -o "StrictHostKeyChecking no" -T -i /tmp/id_rsa root@bogdandm.xyz << EOF
     cd /opt/tests_online/tests_online_docker
-    git pull
-    docker-compose pull
-    docker-compose up -d
+    git pull && \
+    docker-compose -f docker-compose-production.yml pull && \
+    docker-compose -f docker-compose-production.yml up -d
 EOF
