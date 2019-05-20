@@ -15,7 +15,7 @@ services:
       - static-data:/srv/tests-online/django-static
       - frontend-data:/srv/tests-online/frontend-static
       - media-data:/srv/tests-online/media
-      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/ssl/cert:/etc/nginx/ssl
     working_dir: /opt
     ports:
       - "0.0.0.0:80:80"
@@ -31,6 +31,14 @@ services:
       interval: 30s
       timeout: 5s
       retries: 5
+
+  certbot:
+    image: certbot/certbot
+    restart: "no"
+    volumes:
+      - ./nginx/ssl/cert:/etc/letsencrypt
+      - ./nginx/ssl/certbot-well-known:/var/www/certbot
+    entrypoint: tail -f /dev/null
 
   django:
     image: bogdandm/tests-online-django:latest
