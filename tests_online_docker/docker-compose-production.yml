@@ -15,7 +15,9 @@ services:
       - static-data:/srv/tests-online/django-static
       - frontend-data:/srv/tests-online/frontend-static
       - media-data:/srv/tests-online/media
+
       - ./nginx/ssl/cert:/etc/nginx/ssl
+      - ./nginx/ssl/certbot:/etc/nginx/certbot
     working_dir: /opt
     ports:
       - "0.0.0.0:80:80"
@@ -37,7 +39,7 @@ services:
     restart: "no"
     volumes:
       - ./nginx/ssl/cert:/etc/letsencrypt
-      - ./nginx/ssl/certbot-well-known:/var/www/certbot
+      - ./nginx/ssl/certbot:/etc/certbot
     entrypoint: tail -f /dev/null
 
   django:
