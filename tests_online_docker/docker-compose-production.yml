@@ -41,6 +41,7 @@ services:
       - ./nginx/ssl/cert:/etc/letsencrypt
       - ./nginx/ssl/certbot:/etc/certbot
     entrypoint: tail -f /dev/null
+    container_name: tests-online-certbot
 
   django:
     image: bogdandm/tests-online-django:latest
