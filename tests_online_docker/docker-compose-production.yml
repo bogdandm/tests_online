@@ -21,7 +21,7 @@ services:
     working_dir: /opt
     ports:
       - "0.0.0.0:80:80"
-      - "0.0.0.0:443:80"
+      - "0.0.0.0:443:443"
     links:
       - django
     depends_on:
