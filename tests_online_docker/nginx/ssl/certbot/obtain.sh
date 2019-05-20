@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-certbot certonly \
+docker exec test-online-certbot certbot certonly \
     --webroot \
     --email bogdan.dm1995@yandex.ru \
     --no-eff-email \
