@@ -23,4 +23,4 @@ services:
         - bogdandm/tests-online-frontend:unstable
         - bogdandm/tests-online-frontend:latest
       args:
-        REACT_APP_DOMAIN: http://bogdandm.xyz
+        REACT_APP_DOMAIN: http://tests.bogdandm.xyz
