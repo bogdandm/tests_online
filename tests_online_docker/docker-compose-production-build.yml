@@ -4,6 +4,8 @@ services:
   nginx:
     image: bogdandm/tests-online-nginx:latest
     build:
+      args:
+        ROOT_CONF: nginx.conf
       cache_from:
         - bogdandm/tests-online-nginx:unstable
         - bogdandm/tests-online-nginx:latest

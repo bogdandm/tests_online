@@ -8,8 +8,10 @@ RUN apk add --update --no-cache \
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /opt/wait-for-it.sh
 RUN chmod +x /opt/wait-for-it.sh
 
+# Get rid of default setup
 RUN rm /etc/nginx/conf.d/*
-RUN mkdir -p /etc/nginx/ssl/
+RUN rm -rf /etc/nginx/nginx.conf
 
+ARG ROOT_CONF=nginx.conf
 COPY nginx/* /etc/nginx/conf.d/
-COPY nginx/ssl/* /etc/nginx/ssl/
+RUN echo "include \"/etc/nginx/conf.d/${ROOT_CONF}\";" > /etc/nginx/nginx.conf
