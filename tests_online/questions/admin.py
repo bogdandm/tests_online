@@ -18,6 +18,7 @@ class AnswerAdminInline(admin.TabularInline):
 
 @admin.register(models.Question)
 class QuestionAdmin(admin.ModelAdmin):
+    list_display = ("id", "position", "__str__")
     inlines = [AnswerAdminInline]
     list_filter = ("test",)
 
