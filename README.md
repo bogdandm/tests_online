@@ -3,7 +3,7 @@
 
 Just learning React and practicing Django, Docker and other technologies.
 
-Demo: [https://tests.bogdandm.xyz](https://tests.bogdandm.xyz/) (hosted at Digital Ocean)
+**Demo**: [https://tests.bogdandm.xyz](https://tests.bogdandm.xyz/) *(hosted at Digital Ocean)*
 
 Username: `demo` Password: `1234`
 
